@@ -38,7 +38,7 @@ class TagFilter(FilterSet):
         if self.request.user.is_authenticated and value:
             return queryset.filter(shopping_cart__user=self.request.user)
         return queryset
-    
+
 
 class RecipeFilter(FilterSet):
     tags = filters.AllValuesMultipleFilter(field_name="tags__slug")

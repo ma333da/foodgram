@@ -17,12 +17,12 @@ from users.serializers import CropRecipeSerializer
 from .utils import convert_txt
 
 
-
 class IngredientsViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filterset_class = IngredientFilter
+
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
@@ -30,13 +30,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
     filterset_class = RecipeFilter
     permission_classes = (IsOwnerOrReadOnly,)
-    
-    
-        
+
     def get_queryset(self):
         user = self.request.user
         queryset = Recipe.objects.all().select_related('author')
-        if user.is_authenticated:  
+        if user.is_authenticated:
             is_favorite_annotation = Exists(
                 Favorite.objects.filter(
                     user=user,
@@ -78,8 +76,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk=None):
         return self.delete_obj(Cart, request.user, pk)
-     
-    
+
     @action(
         detail=False, methods=["get"], permission_classes=[IsAuthenticated]
     )
@@ -103,7 +100,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             .order_by('ingredient__name')
         )
         return convert_txt(ingredients)
-    
 
     @staticmethod
     def add_obj(model, user, pk):

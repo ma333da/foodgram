@@ -31,15 +31,19 @@ class CustomUserViewSet(UserViewSet):
             )
             serializer.is_valid(raise_exception=True)
             instance = serializer.save()
-            return Response(FollowSerializer(instance, context={"request": request}).data,
-                            status=status.HTTP_201_CREATED)
+            return Response(
+                FollowSerializer(
+                    instance,
+                    context={"request": request}
+                ).data,
+                status=status.HTTP_201_CREATED
+            )
         subscription = Follow.objects.filter(user=request.user, author=author)
         if subscription.count() != 0:
             subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-    
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):

@@ -6,9 +6,7 @@ from rest_framework.validators import UniqueValidator
 from users.models import Follow
 from recipe.models import Recipe
 from drf_extra_fields.fields import Base64ImageField
-from foodgram.constants import(
-    MAX_USERNAME_LENGTH,
-)
+from foodgram.constants import MAX_USERNAME_LENGTH
 
 User = get_user_model()
 
@@ -50,7 +48,7 @@ class CustomUserSerializer(UserSerializer):
             'first_name',
             'last_name',
             'is_subscribed'
-            )
+        )
 
     def get_is_subscribed(self, obj):
         request = self.context.get("request")
@@ -73,15 +71,20 @@ class FollowCreateSerializer(serializers.ModelSerializer):
 
         author = data.get("author")
         if user == author:
-            raise serializers.ValidationError("Нельзя подписаться на самого себя!")
+            raise (
+                serializers.
+                ValidationError("Нельзя подписаться на самого себя!")
+            )
         if Follow.objects.filter(user=user, author=author).exists():
-            raise serializers.ValidationError("Вы уже подписаны на этого пользователя!")
+            raise (
+                serializers.
+                ValidationError("Вы уже подписаны на этого пользователя!"))
         return data
 
     def create(self, validated_data):
         user = self.context["request"].user
         return Follow.objects.create(user=user, **validated_data)
-    
+
 
 class CropRecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
@@ -110,14 +113,22 @@ class FollowSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        return Follow.objects.filter(user=obj.user, author=obj.author).exists()
+        return Follow.objects.filter(
+            user=obj.user,
+            author=obj.author
+        ).exists()
 
     def get_recipes(self, obj):
         request = self.context.get("request")
         limit = None
         if request:
             limit = request.query_params.get("recipes_limit")
-        qs = Recipe.objects.filter(author=obj.author).only("id", "name", "image", "cooking_time")
+        qs = Recipe.objects.filter(author=obj.author).only(
+            "id",
+            "name",
+            "image",
+            "cooking_time"
+        )
         if limit:
             try:
                 qs = qs[:int(limit)]
@@ -127,6 +138,3 @@ class FollowSerializer(serializers.ModelSerializer):
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj.author).count()
-    
-
-

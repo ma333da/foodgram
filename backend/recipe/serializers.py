@@ -5,11 +5,11 @@ from rest_framework.validators import UniqueTogetherValidator
 from .models import (
     Ingredient,
     IngredientAmount,
-    Recipe, 
-    Favorite, 
+    Recipe,
+    Favorite,
     Cart,
     Tag
-    )
+)
 from tags.serializers import TagSerializer
 from users.serializers import CustomUserSerializer
 
@@ -66,7 +66,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         if not user or not user.is_authenticated:
             return False
         return Favorite.objects.filter(user=user, recipe=obj).exists()
-    
+
     def get_is_in_shopping_cart(self, obj):
         annotated = getattr(obj, 'is_in_shopping_cart', None)
         if annotated is not None:
@@ -77,22 +77,22 @@ class RecipeSerializer(serializers.ModelSerializer):
         if not user or not user.is_authenticated:
             return False
         return Cart.objects.filter(user=user, recipe=obj).exists()
-    
+
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         if not instance.image:
             rep['image'] = 'Нету изображения'
         return rep
-    
+
     def validate(self, data):
         ingredients = self.initial_data.get('ingredients')
         image = self.initial_data.get('image')
-        
+
         if not image:
             raise serializers.ValidationError({
                 'image': 'Нужна картинка.'
             })
-        
+
         if not ingredients:
             raise serializers.ValidationError({
                 'ingredients': 'Нужен хоть один ингредиент для рецепта.'
@@ -114,7 +114,8 @@ class RecipeSerializer(serializers.ModelSerializer):
                 ingredient_id_int = int(ingredient_id)
             except (TypeError, ValueError):
                 raise serializers.ValidationError({
-                    'ingredients': f'Некорректный id ингредиента: {ingredient_id}'
+                    'ingredients':
+                        f'Некорректный id ингредиента: {ingredient_id}'
                 })
 
             ingredient_ids.append(ingredient_id_int)
@@ -127,17 +128,17 @@ class RecipeSerializer(serializers.ModelSerializer):
             try:
                 if int(amount) <= 0:
                     raise serializers.ValidationError({
-                        'ingredients': 'Кол-во ингредиентов должно быть больше 0.'
+                        'ingredients':
+                            'Кол-во ингредиентов должно быть больше 0.'
                     })
             except (TypeError, ValueError):
                 raise serializers.ValidationError({
                     'ingredients': 'Кол-во ингредиента должен быть числом.'
                 })
-
             existing_ids = set(
-            Ingredient.objects.filter(id__in=ingredient_ids)
-            .values_list('id', flat=True)
-        )
+                Ingredient.objects.filter(id__in=ingredient_ids)
+                .values_list('id', flat=True)
+            )
         missing_ids = set(ingredient_ids) - existing_ids
         if missing_ids:
             raise serializers.ValidationError({
@@ -148,7 +149,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             ingredient_id for ingredient_id,
             count in ingredient_counts.items() if count > 1
         ]
-        
+
         if duplicates:
             duplicate_names = [
                 Ingredient.objects.get(id=id).name for id in duplicates

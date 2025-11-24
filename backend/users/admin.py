@@ -4,6 +4,7 @@ from .models import BaseUser
 
 from users.models import Follow
 
+
 @admin.register(BaseUser)
 class BaseUserAdmin(UserAdmin):
     list_display = (

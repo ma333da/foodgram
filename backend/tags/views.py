@@ -10,4 +10,3 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     permission_classes = [AllowAny,]
     pagination_class = None
-    
