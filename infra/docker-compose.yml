@@ -12,7 +12,7 @@ services:
     image: ma333da/foodgram_backend:latest
     restart: always
     volumes:
-      - ./data/:app/data/
+      - ./data/:/app/data/
       - static_value:/app/static/
       - media_value:/app/media/
     depends_on:
