@@ -1,10 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
-from foodgram.constants import (
-    MAX_NAME_LENGTH
-)
 from tags.models import Tag
+
+from foodgram.constants import MAX_NAME_LENGTH
 
 User = get_user_model()
 
