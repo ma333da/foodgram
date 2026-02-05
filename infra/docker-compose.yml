@@ -3,12 +3,10 @@ services:
 
   db:
     image: postgres:13.0-alpine
-    ports:
-      - "5432:5432"
     volumes: 
       - db_data:/var/lib/postgresql/data/
     env_file: 
-      - ./.env
+      - .env
  
   backend:
     image: ma333da/foodgram_backend:latest
@@ -20,7 +18,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ./.env 
+      - .env 
 
   frontend:
     image: ma333da/foodgram_frontend:latest
