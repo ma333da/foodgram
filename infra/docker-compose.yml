@@ -13,6 +13,8 @@ services:
   backend:
     image: ma333da/foodgram_backend:latest
     restart: always
+    ports:
+      - 8001:80
     volumes:
       - ./data/:/app/data/
       - static_value:/backend_static
