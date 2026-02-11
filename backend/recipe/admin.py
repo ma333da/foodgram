@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.db.models import Count
 
 from .models import (
     Cart,
@@ -45,16 +44,6 @@ class BaseUserAdmin(UserAdmin):
 class TagAdmin(admin.ModelAdmin): 
     
     list_display = ('pk', 'name', 'slug')
-
-    # def get_queryset(self, request):
-    #     qs = super().get_queryset(request)
-    #     return qs.annotate(recipes_count=Count("recipe", distinct=True))
-
-    # @admin.display(description="Кол-во рецептов", ordering="recipes_count")
-    
-    # def recipes_count(self, obj):
-    #     return obj.recipes_count
-
     
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)

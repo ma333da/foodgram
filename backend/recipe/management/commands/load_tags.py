@@ -23,8 +23,3 @@ class Command(BaseCommand):
             data = json.load(f)
             bulk_data = [Tag(name=tag['name'], slug=tag['slug']) for tag in data]
             Tag.objects.bulk_create(bulk_data)
-            # for ingredient in data:
-            #     obj, created = Ingredient.objects.get_or_create(
-            #         name=ingredient['name'],
-
-            #     )
