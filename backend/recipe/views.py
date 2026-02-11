@@ -4,34 +4,20 @@ from djoser.views import UserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly
-)
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework.permissions import AllowAny
 
 from api.pagination import RecipePagination
 from api.permissions import IsOwnerOrReadOnly
+
 from .filters import IngredientFilter, RecipeFilter
-from .models import (
-    Cart,
-    Favorite,
-    Ingredient,
-    IngredientAmount,
-    Recipe,
-    Tag,
-    Follow
-)
-from .serializers import (
-    IngredientSerializer,
-    RecipeSerializer,
-    TagSerializer,
-    FollowCreateSerializer,
-    CropRecipeSerializer,
-    FollowSerializer
-)
+from .models import (Cart, Favorite, Follow, Ingredient, IngredientAmount,
+                     Recipe, Tag)
+from .serializers import (CropRecipeSerializer, FollowCreateSerializer,
+                          FollowSerializer, IngredientSerializer,
+                          RecipeSerializer, TagSerializer)
 from .utils import convert_txt
 
 BaseUser = get_user_model()

@@ -4,11 +4,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core import validators
 from django.db import models
 
-from .constants import (
-    MAX_NAME_LENGTH,
-    MAX_EMAIL_LENGTH,
-    MAX_USERNAME_LENGTH
-)
+from .constants import MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, MAX_USERNAME_LENGTH
 
 
 class BaseUser(AbstractUser):

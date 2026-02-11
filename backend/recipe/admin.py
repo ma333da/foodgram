@@ -1,16 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import (
-    Cart,
-    Favorite,
-    Ingredient,
-    IngredientAmount,
-    Recipe,
-    Tag,
-    Follow,
-    BaseUser
-)
+from .models import (BaseUser, Cart, Favorite, Follow, Ingredient,
+                     IngredientAmount, Recipe, Tag)
 
 
 class IngredientAdmin(admin.ModelAdmin):
