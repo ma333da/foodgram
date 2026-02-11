@@ -13,24 +13,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-()vn$m8432aj2q@l=q*56vaid(0(8%*%j5bczy8)6r#7p)feet'
-SECRET_KEY = os.getenv('SECRET_KEY', '').split(',')
+SECRET_KEY = 'django-insecure-()vn$m8432aj2q@l=q*56vaid(0(8%*%j5bczy8)6r#7p)feet'
+# SECRET_KEY = os.getenv('SECRET_KEY', '').split(',')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True').lower() == "true"
+DEBUG = os.getenv('DEBUG', 'True').
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = '127.0.0.1',
 
-AUTH_USER_MODEL = 'users.BaseUser'
 
 # Application definition
 
 INSTALLED_APPS = [
-    'api',
-    'users',
-    'tags',
-    'recipe',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,8 +37,11 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'djoser',
-    'colorfield',
+    'recipe',
+    'api',
 ]
+
+AUTH_USER_MODEL = 'recipe.BaseUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -77,13 +76,6 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 DATABASES = {
     'default': {
@@ -155,9 +147,9 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
-        'user_create': 'users.serializers.CustomUserCreateSerializer',
-        'user': 'users.serializers.CustomUserSerializer',
-        'current_user': 'users.serializers.CustomUserSerializer',
+        'user_create': 'djoser.serializers.UserCreateSerializer',
+        'user': 'djoser.serializers.UserCreateSerializer',
+        'current_user': 'djoser.serializers.UserCreateSerializer',
     },
     'PERMISSIONS': {
         'activation': ['rest_framework.permissions.AllowAny'],
@@ -170,10 +162,9 @@ DJOSER = {
         'user_create': ['rest_framework.permissions.AllowAny'],
         'user_delete': ['djoser.permissions.CurrentUserOrAdmin'],
         'user_list': ['rest_framework.permissions.AllowAny'],
-        'user': ['users.permissions.ReadOnlyOrCurrentUserOrAdmin'],
+        'user': ['recipe.permissions.ReadOnlyOrCurrentUserOrAdmin'],
         'token_create': ['rest_framework.permissions.AllowAny'],
         'token_destroy': ['rest_framework.permissions.IsAuthenticated'],
     }
 }
 
-SHOPPING_CART_FILE_NAME = 'cart.txt'

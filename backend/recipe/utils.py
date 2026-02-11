@@ -1,9 +1,7 @@
-from django.conf import settings
 from django.http import HttpResponse
 
-
 def convert_txt(shop_list):
-    file_name = settings.SHOPPING_CART_FILE_NAME
+    file_name = 'cart.txt'
     lines = []
     for ing in shop_list:
         name = ing['ingredient__name']
@@ -11,7 +9,7 @@ def convert_txt(shop_list):
         amount = ing['ingredient_total']
         lines.append(f'{name} ({measurement_unit}) - {amount}')
     content = '\n'.join(lines)
-    content_type = 'text/plain,charset=utf8'
+    content_type = 'text/plain'
     response = HttpResponse(content, content_type=content_type)
     response['Content-Disposition'] = f'attachment; filename={file_name}'
     return response

@@ -1,0 +1,15 @@
+[
+    {
+        "name":"Завтрак",
+        "slug":"breakfast"
+    },
+    {
+        "name":"Обед",
+        "slug":"lunch"
+    },
+    {
+        "name":"Ужин",
+        "slug":"dinner"
+    }
+
+]
