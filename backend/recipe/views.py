@@ -36,6 +36,7 @@ from .utils import convert_txt
 
 BaseUser = get_user_model()
 
+
 class IngredientsViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = Ingredient.objects.all()
@@ -141,7 +142,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def delete_obj(self, model, user, pk):
         recipe = Recipe.objects.filter(id=pk).first()
-        
 
         obj = model.objects.filter(user=user, recipe=recipe)
         if obj.exists():
@@ -158,6 +158,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     permission_classes = [AllowAny, ]
     pagination_class = None
+
 
 class CustomUserViewSet(UserViewSet):
     pagination_class = RecipePagination

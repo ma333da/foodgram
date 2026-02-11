@@ -2,6 +2,7 @@ from django_filters.rest_framework import FilterSet, filters
 
 from .models import Tag, BaseUser, Ingredient, Recipe
 
+
 class IngredientFilter(FilterSet):
     name = filters.CharFilter(field_name='name', lookup_expr='istartswith')
 

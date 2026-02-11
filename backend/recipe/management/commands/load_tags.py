@@ -21,5 +21,10 @@ class Command(BaseCommand):
                     DATA_ROOT,
                     options['filename']), 'r', encoding='utf-8') as f:
             data = json.load(f)
-            bulk_data = [Tag(name=tag['name'], slug=tag['slug']) for tag in data]
+            bulk_data = [
+                Tag(
+                    name=tag['name'],
+                    slug=tag['slug']
+                ) for tag in data
+            ]
             Tag.objects.bulk_create(bulk_data)

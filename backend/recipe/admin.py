@@ -10,7 +10,7 @@ from .models import (
     Tag,
     Follow,
     BaseUser
-    )
+)
 
 
 class IngredientAdmin(admin.ModelAdmin):
@@ -25,10 +25,12 @@ class RecipeAdmin(admin.ModelAdmin):
     def count_favorites(self, obj):
         return obj.favorites.count()
 
+
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('user', 'author')
     search_fields = ('user__username', 'author__username')
-    
+
+
 class BaseUserAdmin(UserAdmin):
     list_display = (
         'username',
@@ -39,12 +41,13 @@ class BaseUserAdmin(UserAdmin):
     )
     search_fields = ('username', 'email')
     ordering = ('username',)
-    
 
-class TagAdmin(admin.ModelAdmin): 
-    
+
+class TagAdmin(admin.ModelAdmin):
+
     list_display = ('pk', 'name', 'slug')
-    
+
+
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Cart)

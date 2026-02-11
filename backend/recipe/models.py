@@ -120,14 +120,15 @@ class Tag(models.Model):
         verbose_name='Идентификатор',
         help_text='Введите Идентификатор'
     )
-    
+
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
         ordering = ('pk', )
-        
+
     def __str__(self):
         return self.name
+
 
 class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,
@@ -234,4 +235,3 @@ class Cart(models.Model):
             models.UniqueConstraint(fields=['user', 'recipe'],
                                     name='personal user cart')
         ]
-

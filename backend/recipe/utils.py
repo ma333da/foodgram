@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 
+
 def convert_txt(shop_list):
     file_name = 'cart.txt'
     lines = []

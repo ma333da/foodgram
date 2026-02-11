@@ -21,5 +21,9 @@ class Command(BaseCommand):
                     DATA_ROOT,
                     options['filename']), 'r', encoding='utf-8') as f:
             data = json.load(f)
-            bulk_data = [Ingredient(name=ingredient['name'], measurement_unit=ingredient['measurement_unit']) for ingredient in data]
+            bulk_data = [
+                Ingredient(
+                    name=ingredient['name'],
+                    measurement_unit=ingredient['measurement_unit']
+                ) for ingredient in data]
             Ingredient.objects.bulk_create(bulk_data)
