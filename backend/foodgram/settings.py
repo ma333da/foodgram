@@ -18,7 +18,7 @@ SECRET_KEY = 'django-insecure-()vn$m8432aj2q@l=q*56vaid(0(8%*%j5bczy8)6r#7p)feet
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True')
+DEBUG = os.getenv('DEBUG', 'False')
 
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 ALLOWED_HOSTS = '127.0.0.1',
@@ -79,14 +79,21 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'name123'),
-        'USER': os.getenv('POSTGRES_USER', 'user123'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'pass123'),
-        'HOST': os.getenv('DB_HOST', 'host123'),
-        'PORT': os.getenv('DB_PORT', 5432)
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('DB_NAME', 'name123'),
+#         'USER': os.getenv('POSTGRES_USER', 'user123'),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'pass123'),
+#         'HOST': os.getenv('DB_HOST', 'host123'),
+#         'PORT': os.getenv('DB_PORT', 5432)
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -135,7 +142,7 @@ MEDIA_URL = os.getenv('MEDIA_URL')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        "rest_framework.authentication.TokenAuthentication",
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'],
@@ -162,7 +169,7 @@ DJOSER = {
         'user_create': ['rest_framework.permissions.AllowAny'],
         'user_delete': ['djoser.permissions.CurrentUserOrAdmin'],
         'user_list': ['rest_framework.permissions.AllowAny'],
-        'user': ['recipe.permissions.ReadOnlyOrCurrentUserOrAdmin'],
+        'user': ['api.permissions.ReadOnlyOrAdmin'],
         'token_create': ['rest_framework.permissions.AllowAny'],
         'token_destroy': ['rest_framework.permissions.IsAuthenticated'],
     }

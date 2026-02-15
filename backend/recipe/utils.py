@@ -1,8 +1,9 @@
-from django.http import HttpResponse
+from django.http import FileResponse
+from datetime import date
+date = date.today().isoformat
 
 
-def convert_txt(shop_list):
-    file_name = 'cart.txt'
+def generate_text(shop_list):
     lines = []
     for ing in shop_list:
         name = ing['ingredient__name']
@@ -10,7 +11,16 @@ def convert_txt(shop_list):
         amount = ing['ingredient_total']
         lines.append(f'{name} ({measurement_unit}) - {amount}')
     content = '\n'.join(lines)
+    return content
+
+
+def convert_txt(shop_list):
+    file_name = 'cart.txt'
+    content = generate_text(shop_list)
     content_type = 'text/plain'
-    response = HttpResponse(content, content_type=content_type)
-    response['Content-Disposition'] = f'attachment; filename={file_name}'
+    response = FileResponse(
+        content,
+        content_type=content_type,
+        filename=file_name
+    )
     return response
