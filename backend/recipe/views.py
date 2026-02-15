@@ -1,22 +1,37 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Sum
+from django.http import Http404
 from djoser.views import UserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly
+)
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from ..api.filters import IngredientFilter, RecipeFilter
 from ..api.pagination import RecipePagination
 from ..api.permissions import IsOwnerOrReadOnly
-from .models import (Cart, Favorite, Follow, Ingredient, IngredientAmount,
-                     Recipe, Tag)
-from .serializers import (CropRecipeSerializer, IngredientSerializer,
-                          RecipeSerializer, TagSerializer)
+from .models import (
+    Cart,
+    Favorite,
+    Follow,
+    Ingredient,
+    IngredientAmount,
+    Recipe,
+    Tag
+)
+from .serializers import (
+    CropRecipeSerializer,
+    IngredientSerializer,
+    RecipeSerializer,
+    TagSerializer
+)
 from .utils import convert_txt
 
 BaseUser = get_user_model()
@@ -139,10 +154,10 @@ class FoodgramUserViewSet(UserViewSet):
         user = request.user
         if request.method == 'POST':
             if user == author:
-                raise ValidationError('Нельзя подписаться на самого себя!')
+                raise ValidationError("Нельзя подписаться на самого себя!")
             if Follow.objects.filter(user=user, author=author).exists():
                 raise ValidationError(
-                    'Вы уже подписаны на этого пользователя!'
+                    "Вы уже подписаны на этого пользователя!"
                 )
 
             try:
@@ -157,17 +172,20 @@ class FoodgramUserViewSet(UserViewSet):
                 'author': author.pk
             }
             return Response(response_data, status=status.HTTP_201_CREATED)
-        subscription = Follow.objects.filter(user=user, author=author)
-        if subscription.exists():
-            subscription.delete()
+        try:
+            get_object_or_404(Follow, user=user, author=author).delete
             return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Http404:
+            return Response(
+                {
+                    'detail': 'Вы не подписаны на этого автора'
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         user = request.user
-        queryset = Follow.objects.filter(user=user)
+        queryset = user.subscriptions.all()
         pages = self.paginate_queryset(queryset)
         response_data = [
             {
