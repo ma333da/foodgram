@@ -2,16 +2,8 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 
-from .models import (
-    BaseUser,
-    Cart,
-    Favorite,
-    Follow,
-    Ingredient,
-    IngredientAmount,
-    Recipe,
-    Tag,
-)
+from .models import (BaseUser, Cart, Favorite, Follow, Ingredient,
+                     IngredientAmount, Recipe, Tag)
 
 
 class BaseUserAdmin(UserAdmin):
