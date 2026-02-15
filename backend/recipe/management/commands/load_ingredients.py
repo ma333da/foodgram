@@ -1,5 +1,6 @@
-from .load_data_base import BaseDataImportCommand
 from recipe.models import Ingredient
+
+from .load_data_base import BaseDataImportCommand
 
 
 class Command(BaseDataImportCommand):

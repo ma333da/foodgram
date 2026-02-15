@@ -1,18 +1,11 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
-from .models import (
-    Cart,
-    Favorite,
-    Follow,
-    Ingredient,
-    IngredientAmount,
-    Recipe,
-    Tag
-)
-from .constants import MIN_AMOUNT, MAX_AMOUNT
+from .constants import MAX_AMOUNT, MIN_AMOUNT
+from .models import (Cart, Favorite, Follow, Ingredient, IngredientAmount,
+                     Recipe, Tag)
 
 User = get_user_model()
 
