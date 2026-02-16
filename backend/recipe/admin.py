@@ -19,43 +19,40 @@ class BaseUserAdmin(UserAdmin):
         'follower_count',
     )
     search_fields = ('username', 'email')
-    ordering = ('username',)
+    ordering = ('username',) 
 
     def full_name(self, base_user):
         return f'{base_user.first_name} {base_user.last_name}'
 
     full_name.short_description = 'ФИО'
-
-    def recipe_count(self, base_user):
-        return base_user.recipes.count()
-
-    recipe_count.short_description = 'Количество рецептов'
+    
+    @admin.display(description='Количество рецептов')
+    def recipe_count(self, user):
+        return user.recipes.count()
 
     @mark_safe
-    def avatar(self, base_user):
-        if base_user.avatar:
+    def avatar(self, user):
+        if user.avatar:
             return (
-                f'<img src="{base_user.avatar.url}" width="50" height="50" />'
+                f'<img src="{user.avatar.url}" width="50" height="50" />'
             )
         return '<p>Нет аватара</p>'
 
-    def subscription_count(self, obj):
-        return obj.followers.count()
+    @admin.display(description='Количество подписок')
+    def subscription_count(self, user):
+        return user.followers.count()
 
-    subscription_count.short_description = 'Количество подписок'
-
-    def follower_count(self, obj):
-        return obj.authors.count()
-
-    follower_count.short_description = 'Количество подписчиков'
+    @admin.display(description='Количество подписчиков')
+    def follower_count(self, user):
+        return user.authors.count()
 
 
 class CartAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('user', 'recipe')
 
 
 class FavoriteAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('user', 'recipe')
 
 
 class IngredientAdmin(admin.ModelAdmin):
@@ -64,7 +61,7 @@ class IngredientAdmin(admin.ModelAdmin):
     search_fields = ('name', 'measurement_unit')
 
     def number_of_recipes(self, ingridient):
-        return ingridient.ingredientamount_set.count()
+        return ingridient.ingredients_amount.count()
 
     number_of_recipes.short_description = 'Число рецептов'
 
@@ -85,22 +82,19 @@ class RecipeAdmin(admin.ModelAdmin):
         'image_preview',
     )
 
+    @admin.display(description='В избранном')
     def count_favorites(self, recipe):
         return recipe.favorite_set.count()
 
-    count_favorites.short_description = 'В избранном'
-
+    @admin.display(description='Новое описание')
     def ingredients_list(self, recipe):
-        return '\n '.join(
-            [ingredient.name for ingredient in recipe.ingredients.all()]
+        return '<br>'.join(
+            ingredient.name for ingredient in recipe.ingredients.all()
         )
 
-    ingredients_list.short_description = 'Продукты'
-
+    @admin.display(description='Теги')
     def tags_list(self, recipe):
-        return ', '.join([tag.name for tag in recipe.tags.all()])
-
-    tags_list.short_description = 'Теги'
+        return '<br>'.join(tag.name for tag in recipe.tags.all())
 
     @mark_safe
     def image_preview(self, recipe):
@@ -108,7 +102,7 @@ class RecipeAdmin(admin.ModelAdmin):
             return f'<img src="{recipe.image.url}" width="50" height="50"/>'
         return 'Нет изображения'
 
-
+        
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'author')
     search_fields = ('user__username', 'author__username')
@@ -117,10 +111,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'slug', 'recipe_count')
 
-    def recipe_count(self, obj):
-        return obj.recipe_set.count()
+    @admin.display(description='Количество рецептов')
+    def recipe_count(self, tag):
+        return tag.recipe_set.count()
 
-    recipe_count.short_description = 'Количество рецептов'
 
 
 admin.site.register(Ingredient, IngredientAdmin)

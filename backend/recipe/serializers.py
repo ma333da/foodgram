@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
-from .constants import MAX_AMOUNT, MIN_AMOUNT
+from .constants import MIN_AMOUNT
 from .models import (Cart, Favorite, Follow, Ingredient, IngredientAmount,
                      Recipe, Tag)
 
@@ -81,10 +81,7 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
         validators=[
             MinValueValidator(
                 1, message=f'Количество должно быть не менее {MIN_AMOUNT}'
-            ),
-            MaxValueValidator(
-                1000, message=f'Количество не может превышать {MAX_AMOUNT}'
-            ),  # Укажите нужное максимальное значение
+            )
         ]
     )
 

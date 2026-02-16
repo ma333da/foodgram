@@ -5,7 +5,7 @@ from django.core import validators
 from django.db import models
 
 from .constants import (MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, MAX_USERNAME_LENGTH,
-                        MIN_COOKING_TIME, MIN_NUM_OF_INGREDIENTS)
+                        MIN_COOKING_TIME, MAX_SLUG_LENGTH)
 
 
 class BaseUser(AbstractUser):
@@ -115,7 +115,7 @@ class Tag(models.Model):
         help_text='Введите название тега',
     )
     slug = models.SlugField(
-        max_length=32,
+        max_length=MAX_SLUG_LENGTH,
         unique=True,
         verbose_name='Идентификатор',
         help_text='Введите Идентификатор',
@@ -164,7 +164,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('name',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
@@ -174,21 +174,17 @@ class IngredientAmount(models.Model):
         Ingredient,
         on_delete=models.CASCADE,
         verbose_name='Продукт',
-        related_name='ingredients',
+        related_name='ingredients_amount',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        verbose_name='Рецепт',
-        related_name='recipes'
-    )
-    validators_message = (
-        f'Минимальное количество продуктов {MIN_NUM_OF_INGREDIENTS}'
+        verbose_name='Рецепт'
     )
     amount = models.PositiveSmallIntegerField(
         validators=(
             validators.MinValueValidator(
-                MIN_NUM_OF_INGREDIENTS, message=validators_message
+                1, message='Минимальное количество продуктов 1'
             ),
         ),
         verbose_name='Количество',
@@ -196,8 +192,8 @@ class IngredientAmount(models.Model):
 
     class Meta:
         ordering = ('ingredient',)
-        verbose_name = 'Количество продуктов'
-        verbose_name_plural = 'Количество продуктов'
+        verbose_name = 'Продукт'
+        verbose_name_plural = 'Продукты'
         constraints = [
             models.UniqueConstraint(
                 fields=['ingredient', 'recipe'],
