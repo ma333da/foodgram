@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
@@ -24,7 +25,7 @@ class BaseDataImportCommand(BaseCommand):
                 Path(DATA_ROOT) / filename, 'r', encoding='utf-8'
             ) as f:
                 bulk_data = [
-                    self.model(**item) # type: ignore
+                    self.model(**item)  # type: ignore
                     for item in json.load(f)
                 ]
                 self.model.objects.bulk_create(bulk_data)
@@ -40,8 +41,8 @@ class BaseDataImportCommand(BaseCommand):
             raise CommandError(
                 f'Файл {options["filename"]} не найден по пути {DATA_ROOT}.'
             )
-        except FieldDoesNotExist as e: 
-            raise CommandError( 
+        except FieldDoesNotExist as e:
+            raise CommandError(
                 f'Поле не найдено в модели: {str(e)}'
             )
         except Exception as e:

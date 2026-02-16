@@ -5,6 +5,8 @@ from django.utils.safestring import mark_safe
 from .models import (BaseUser, Cart, Favorite, Follow, Ingredient,
                      IngredientAmount, Recipe, Tag)
 
+# class _count():
+
 
 class BaseUserAdmin(UserAdmin):
     list_display = (
@@ -19,13 +21,13 @@ class BaseUserAdmin(UserAdmin):
         'follower_count',
     )
     search_fields = ('username', 'email')
-    ordering = ('username',) 
+    ordering = ('username',)
 
     def full_name(self, base_user):
         return f'{base_user.first_name} {base_user.last_name}'
 
     full_name.short_description = 'ФИО'
-    
+
     @admin.display(description='Количество рецептов')
     def recipe_count(self, user):
         return user.recipes.count()
@@ -61,7 +63,7 @@ class IngredientAdmin(admin.ModelAdmin):
     search_fields = ('name', 'measurement_unit')
 
     def number_of_recipes(self, ingridient):
-        return ingridient.ingredients_amount.count()
+        return ingridient.ingredientamount_set.count()
 
     number_of_recipes.short_description = 'Число рецептов'
 
@@ -84,17 +86,22 @@ class RecipeAdmin(admin.ModelAdmin):
 
     @admin.display(description='В избранном')
     def count_favorites(self, recipe):
-        return recipe.favorite_set.count()
+        return recipe.favorites.count()
 
-    @admin.display(description='Новое описание')
-    def ingredients_list(self, recipe):
-        return '<br>'.join(
-            ingredient.name for ingredient in recipe.ingredients.all()
-        )
-
+    @mark_safe
     @admin.display(description='Теги')
     def tags_list(self, recipe):
         return '<br>'.join(tag.name for tag in recipe.tags.all())
+
+    @mark_safe
+    @admin.display(description='Ингредиенты')
+    def ingredients_list(self, recipe):
+        return '<br>'.join(
+            f'{ingredient_amount.ingredient.name} \
+            ({ingredient_amount.amount} \
+            {ingredient_amount.ingredient.measurement_unit})'
+            for ingredient_amount in recipe.ingredientamount_set.all()
+        )
 
     @mark_safe
     def image_preview(self, recipe):
@@ -102,7 +109,7 @@ class RecipeAdmin(admin.ModelAdmin):
             return f'<img src="{recipe.image.url}" width="50" height="50"/>'
         return 'Нет изображения'
 
-        
+
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'author')
     search_fields = ('user__username', 'author__username')
@@ -113,8 +120,7 @@ class TagAdmin(admin.ModelAdmin):
 
     @admin.display(description='Количество рецептов')
     def recipe_count(self, tag):
-        return tag.recipe_set.count()
-
+        return tag.recipes.count()
 
 
 admin.site.register(Ingredient, IngredientAdmin)

@@ -4,8 +4,8 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core import validators
 from django.db import models
 
-from .constants import (MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, MAX_USERNAME_LENGTH,
-                        MIN_COOKING_TIME, MAX_SLUG_LENGTH)
+from .constants import (MAX_EMAIL_LENGTH, MAX_NAME_LENGTH, MAX_SLUG_LENGTH,
+                        MAX_USERNAME_LENGTH, MIN_COOKING_TIME)
 
 
 class BaseUser(AbstractUser):
@@ -80,7 +80,8 @@ class UserRecipeRelation(models.Model):
         default_related_name = '%(class)ss'
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe'], name='favorite recipe for user'
+                fields=['user', 'recipe'],
+                name='избранный рецепт пользователя'
             )
         ]
 
@@ -99,7 +100,8 @@ class Ingredient(models.Model):
         verbose_name_plural = 'Продукты'
         constraints = [
             models.UniqueConstraint(
-                fields=['name', 'measurement_unit'], name='unique ingredient'
+                fields=['name', 'measurement_unit'],
+                name='уникальный продукт'
             )
         ]
 
@@ -135,7 +137,6 @@ class Recipe(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор',
-        related_name='recipes',
     )
     name = models.CharField(
         max_length=MAX_NAME_LENGTH, verbose_name='Название'
@@ -167,14 +168,14 @@ class Recipe(models.Model):
         ordering = ('name',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        default_related_name = '%(class)ss'
 
 
 class IngredientAmount(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        verbose_name='Продукт',
-        related_name='ingredients_amount',
+        verbose_name='Продукт'
     )
     recipe = models.ForeignKey(
         Recipe,
@@ -189,26 +190,39 @@ class IngredientAmount(models.Model):
         ),
         verbose_name='Количество',
     )
+    default_related_name = '%(class)ss'
 
     class Meta:
         ordering = ('ingredient',)
-        verbose_name = 'Продукт'
-        verbose_name_plural = 'Продукты'
+        verbose_name = 'Ингридиент'
+        verbose_name_plural = 'Ингридиенты'
         constraints = [
             models.UniqueConstraint(
                 fields=['ingredient', 'recipe'],
-                name='unique ingredients recipe'
+                name='уникальное количество ингридиентов в рецепте'
             )
         ]
 
 
 class Favorite(UserRecipeRelation):
-    class Meta:
+    class Meta(UserRecipeRelation.Meta):
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='Уникальный избранный пользовательский рецепт '
+            )
+        ]
 
 
 class Cart(UserRecipeRelation):
-    class Meta:
+    class Meta(UserRecipeRelation.Meta):
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзина'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='Уникальный пользовательский рецепт в корзине'
+            )
+        ]

@@ -3,9 +3,16 @@ from django.core.validators import MinValueValidator
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
-from .constants import MIN_AMOUNT
-from .models import (Cart, Favorite, Follow, Ingredient, IngredientAmount,
-                     Recipe, Tag)
+from recipe.constants import MIN_AMOUNT
+from recipe.models import (
+    Cart,
+    Favorite,
+    Follow,
+    Ingredient,
+    IngredientAmount,
+    Recipe,
+    Tag,
+)
 
 User = get_user_model()
 
@@ -15,7 +22,7 @@ class FoodgramUserSerializer(UserSerializer):
 
     class Meta:
         model = User
-        fields = UserSerializer.Meta.fields + ('is_subscribed',)
+        fields = (*UserSerializer.Meta.fields, 'is_subscribed')
         read_only_fields = fields
 
     def get_is_subscribed(self, author):
@@ -38,20 +45,20 @@ class CropRecipeSerializer(serializers.ModelSerializer):
 
 class FollowSerializer(FoodgramUserSerializer):
     recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.SerializerMethodField()
+    recipes_count = serializers.IntegerField(source='user.recipes.count()')
 
     class Meta:
         model = User
-        fields = FoodgramUserSerializer.Meta.fields + (
-            'recipes', 'recipes_count'
+        fields = (
+            *FoodgramUserSerializer.Meta.fields,
+            'recipes',
+            'recipes_count'
         )
         read_only_fields = fields
 
     def get_recipes(self, recipe):
         request = self.context.get('request')
-        limit = None
-        if request:
-            limit = request.query_params.get('recipes_limit')
+        limit = request.query_params.get('recipes_limit')
         qs = Recipe.objects.filter(author=recipe.author)
 
         if limit:
@@ -62,7 +69,7 @@ class FollowSerializer(FoodgramUserSerializer):
         return CropRecipeSerializer(qs, many=True).data
 
     def get_recipes_count(self, recipe):
-        return Recipe.objects.filter(author=recipe.author).count()
+        return recipe.objects.filter(author=recipe.author).count()
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -77,10 +84,11 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
     )
-    amount = serializers.PositiveIntegerField(
+    amount = serializers.IntegerField(
         validators=[
             MinValueValidator(
-                1, message=f'Количество должно быть не менее {MIN_AMOUNT}'
+                {MIN_AMOUNT},
+                message=f'Количество должно быть не менее {MIN_AMOUNT}'
             )
         ]
     )
@@ -122,7 +130,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time',
         )
-        read_only_fields = fields
 
     def _is_related(self, recipe, relation_model):
         annotated = getattr(recipe, relation_model.__name__.lower(), None)
@@ -133,7 +140,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         user = getattr(request, 'user', None)
         if not user or not user.is_authenticated:
             return False
-        return relation_model.objects.filter(user=user, recipe=recipe).exists()
+        return relation_model.objects.filter(
+            user=user,
+            recipe=recipe
+        ).exists()
 
     def get_is_favorited(self, favorite):
         return self._is_related(favorite, Favorite)

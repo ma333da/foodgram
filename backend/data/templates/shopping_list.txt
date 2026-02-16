@@ -1,0 +1,13 @@
+Список покупок
+Дата составления: {{ date }}
+
+Продукты:
+{% for item in shop_list %}
+{{ forloop.counter }}. {{ item.name|capitalize }} ({{ item.measurement_unit }}) - {{ item.amount }}
+{% endfor %}
+
+Рецепты:
+{% for recipe in recipes %}
+- {{ recipe.name }} (автор: {{ recipe.author.username }})
+Теги: {% for tag in recipe.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+{% endfor %}
