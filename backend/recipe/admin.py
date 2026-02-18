@@ -1,14 +1,18 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 
 from .models import (BaseUser, Cart, Favorite, Follow, Ingredient,
                      IngredientAmount, Recipe, Tag)
 
-# class _count():
+
+class BaseAdminWithRecipeCount(admin.ModelAdmin):
+    @admin.display(description='Рецепты')
+    def recipe_count(self, instance):
+        return instance.recipes.count()
 
 
-class BaseUserAdmin(UserAdmin):
+@admin.register(BaseUser)
+class BaseUserAdmin(BaseAdminWithRecipeCount):
     list_display = (
         'pk',
         'username',
@@ -28,10 +32,6 @@ class BaseUserAdmin(UserAdmin):
 
     full_name.short_description = 'ФИО'
 
-    @admin.display(description='Количество рецептов')
-    def recipe_count(self, user):
-        return user.recipes.count()
-
     @mark_safe
     def avatar(self, user):
         if user.avatar:
@@ -40,7 +40,7 @@ class BaseUserAdmin(UserAdmin):
             )
         return '<p>Нет аватара</p>'
 
-    @admin.display(description='Количество подписок')
+    @admin.display(description='Подписки')
     def subscription_count(self, user):
         return user.followers.count()
 
@@ -49,29 +49,28 @@ class BaseUserAdmin(UserAdmin):
         return user.authors.count()
 
 
+@admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe')
 
 
+@admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe')
 
 
-class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'measurement_unit', 'number_of_recipes')
-    list_filter = ('name', 'measurement_unit')
+@admin.register(Ingredient)
+class IngredientAdmin(BaseAdminWithRecipeCount):
+    list_display = ('pk', 'name', 'measurement_unit', 'recipe_count')
     search_fields = ('name', 'measurement_unit')
 
-    def number_of_recipes(self, ingridient):
-        return ingridient.ingredientamount_set.count()
 
-    number_of_recipes.short_description = 'Число рецептов'
-
-
+@admin.register(IngredientAmount)
 class IngredientAmountAdmin(admin.ModelAdmin):
     list_display = ('pk', 'recipe', 'ingredient', 'amount')
 
 
+@admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = (
         'id',
@@ -97,37 +96,27 @@ class RecipeAdmin(admin.ModelAdmin):
     @admin.display(description='Ингредиенты')
     def ingredients_list(self, recipe):
         return '<br>'.join(
-            f'{ingredient_amount.ingredient.name} \
-            ({ingredient_amount.amount} \
-            {ingredient_amount.ingredient.measurement_unit})'
-            for ingredient_amount in recipe.ingredientamount_set.all()
+            ''.join((
+                ingredient_amount.ingredient.name,
+                f'({ingredient_amount.amount} ',
+                f'{ingredient_amount.ingredient.measurement_unit})')
+            )
+            for ingredient_amount in recipe.ingredientamounts.all()
         )
 
     @mark_safe
     def image_preview(self, recipe):
         if recipe.image:
             return f'<img src="{recipe.image.url}" width="50" height="50"/>'
-        return 'Нет изображения'
+        return ''
 
 
+@admin.register(Follow)
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'author')
     search_fields = ('user__username', 'author__username')
 
 
-class TagAdmin(admin.ModelAdmin):
+@admin.register(Tag)
+class TagAdmin(BaseAdminWithRecipeCount):
     list_display = ('pk', 'name', 'slug', 'recipe_count')
-
-    @admin.display(description='Количество рецептов')
-    def recipe_count(self, tag):
-        return tag.recipes.count()
-
-
-admin.site.register(Ingredient, IngredientAdmin)
-admin.site.register(Recipe, RecipeAdmin)
-admin.site.register(Cart, CartAdmin)
-admin.site.register(Favorite, FavoriteAdmin)
-admin.site.register(IngredientAmount, IngredientAmountAdmin)
-admin.site.register(Tag, TagAdmin)
-admin.site.register(Follow, SubscriptionAdmin)
-admin.site.register(BaseUser, BaseUserAdmin)

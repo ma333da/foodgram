@@ -1,13 +1,9 @@
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 
-from .views import RecipeShortLinkViewSet
+from . import views
 
-router = DefaultRouter()
-
-router.register(r'recipes', RecipeShortLinkViewSet)
+app_name = 'recipe'
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('auth/', include('djoser.urls.authtoken')),
+    path('', views._generate_recipe_short_link, name='recipe_redirect'),
 ]

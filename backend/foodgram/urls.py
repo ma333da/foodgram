@@ -3,5 +3,7 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls', namespace='api'))
+    path('api/', include('api.urls', namespace='api')),
+    path('s/<int:recipe_id>/', include('recipe.urls', namespace='recipe')),
+    path('auth/', include('djoser.urls.authtoken'))
 ]
