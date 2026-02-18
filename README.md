@@ -1,6 +1,6 @@
 ## Автор
 
-Владимир Симоньянц [ma333da](https://github.com/ma333da)
+Владимир Симоньянц [ma333da](https://ma333da@yandex.ru)
 
 ## Техно стек
 [![Python](https://img.shields.io/badge/-Python-464646?style=flat&logo=Python&logoColor=56C0C0&color=008080)](https://www.python.org/)
@@ -9,6 +9,12 @@
 
 
 ## Команды запуска
+
+- Клонируем репозиторий
+
+```bash
+git clone https://github.com/ma333da/foodgramt.git
+```
 
 - Запускаем docker compose:
 
@@ -54,6 +60,7 @@ git clone https://github.com/ma333da/foodgramt.git
 - Уставливаем python=3.9 и создаем виртуальное окружение
 
 ```bash
+cd ./foodgram/backend
 python3 -m venv foodgram
 ```
 
