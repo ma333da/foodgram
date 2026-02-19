@@ -5,5 +5,6 @@ from . import views
 app_name = 'recipe'
 
 urlpatterns = [
-    path('', views._generate_recipe_short_link, name='recipe_redirect'),
+    path('s/<int:recipe_id>/',
+         views._generate_recipe_short_link, name='short_link_view'),
 ]

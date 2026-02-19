@@ -19,7 +19,7 @@ git clone https://github.com/ma333da/foodgramt.git
 - Запускаем docker compose:
 
 ```bash
-cd ../infra
+cd foodgram/infra
 docker-compose up -d --build
 ```
 
@@ -60,7 +60,7 @@ git clone https://github.com/ma333da/foodgramt.git
 - Уставливаем python=3.9 и создаем виртуальное окружение
 
 ```bash
-cd ./foodgram/backend
+cd foodgram/backend
 python3 -m venv foodgram
 ```
 

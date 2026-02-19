@@ -1,11 +1,21 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .models import (BaseUser, Cart, Favorite, Follow, Ingredient,
-                     IngredientAmount, Recipe, Tag)
+from .models import (
+    BaseUser,
+    Cart,
+    Favorite,
+    Follow,
+    Ingredient,
+    IngredientAmount,
+    Recipe,
+    Tag,
+)
 
 
 class BaseAdminWithRecipeCount(admin.ModelAdmin):
+    list_display = ('recipe_count',)
+
     @admin.display(description='Рецепты')
     def recipe_count(self, instance):
         return instance.recipes.count()
@@ -19,7 +29,7 @@ class BaseUserAdmin(BaseAdminWithRecipeCount):
         'email',
         'full_name',
         'is_staff',
-        'recipe_count',
+        *BaseAdminWithRecipeCount.list_display,
         'avatar',
         'subscription_count',
         'follower_count',
@@ -27,41 +37,38 @@ class BaseUserAdmin(BaseAdminWithRecipeCount):
     search_fields = ('username', 'email')
     ordering = ('username',)
 
-    def full_name(self, base_user):
-        return f'{base_user.first_name} {base_user.last_name}'
-
-    full_name.short_description = 'ФИО'
+    @admin.display(description='ФИО')
+    def full_name(self, user):
+        return f'{user.first_name} {user.last_name}'
 
     @mark_safe
     def avatar(self, user):
         if user.avatar:
-            return (
-                f'<img src="{user.avatar.url}" width="50" height="50" />'
-            )
-        return '<p>Нет аватара</p>'
+            return f'<img src="{user.avatar.url}" width="50" height="50" />'
+        return '<p></p>'
 
     @admin.display(description='Подписки')
     def subscription_count(self, user):
         return user.followers.count()
 
-    @admin.display(description='Количество подписчиков')
+    @admin.display(description='Подписчики')
     def follower_count(self, user):
         return user.authors.count()
 
 
-@admin.register(Cart)
-class CartAdmin(admin.ModelAdmin):
-    list_display = ('user', 'recipe')
-
-
-@admin.register(Favorite)
+@admin.register(Favorite, Cart)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe')
 
 
 @admin.register(Ingredient)
 class IngredientAdmin(BaseAdminWithRecipeCount):
-    list_display = ('pk', 'name', 'measurement_unit', 'recipe_count')
+    list_display = (
+        'pk',
+        'name',
+        'measurement_unit',
+        *BaseAdminWithRecipeCount.list_display,
+    )
     search_fields = ('name', 'measurement_unit')
 
 
@@ -96,12 +103,14 @@ class RecipeAdmin(admin.ModelAdmin):
     @admin.display(description='Ингредиенты')
     def ingredients_list(self, recipe):
         return '<br>'.join(
-            ''.join((
-                ingredient_amount.ingredient.name,
-                f'({ingredient_amount.amount} ',
-                f'{ingredient_amount.ingredient.measurement_unit})')
+            (
+                (
+                    f"""{ingredient_amount.ingredient.name}',
+                ({ingredient_amount.amount}
+                '{ingredient_amount.ingredient.measurement_unit})"""
+                )
+                for ingredient_amount in recipe.ingredientamounts.all()
             )
-            for ingredient_amount in recipe.ingredientamounts.all()
         )
 
     @mark_safe
@@ -119,4 +128,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(BaseAdminWithRecipeCount):
-    list_display = ('pk', 'name', 'slug', 'recipe_count')
+    list_display = (
+        'pk',
+        'name',
+        'slug',
+        *BaseAdminWithRecipeCount.list_display,
+    )
+    search_fields = ('name', 'slug')

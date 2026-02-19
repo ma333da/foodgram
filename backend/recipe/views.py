@@ -1,9 +1,12 @@
 from django.shortcuts import redirect
-from rest_framework.generics import get_object_or_404
+from rest_framework import status
+from rest_framework.response import Response
 
 from .models import Recipe
 
 
 def _generate_recipe_short_link(request, recipe_id):
-    get_object_or_404(Recipe, id=recipe_id)
-    return redirect(f"/api/recipe/{recipe_id}")
+    if Recipe.objects.filter(id=recipe_id).exists():
+        return redirect(f"/recipe/{recipe_id}")
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)

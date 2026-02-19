@@ -1,7 +1,12 @@
+from datetime import date
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Sum
+from django.http import FileResponse
+from django.template.loader import render_to_string
 from djoser.views import UserViewSet
+from django.urls import reverse
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -35,7 +40,6 @@ from .serializers import (
     RecipeWriteSerializer,
     TagSerializer,
 )
-from .utils import generate_text
 
 BaseUser = get_user_model()
 
@@ -82,51 +86,63 @@ class RecipeViewSet(viewsets.ModelViewSet):
         detail=True, methods=['post'], permission_classes=[IsAuthenticated]
     )
     def favorite(self, request, pk=None):
-        return self.add_recipe(Favorite, request.user, pk)
+        return self.add_recipe_to_collection(Favorite, request.user, pk)
 
     @favorite.mapping.delete
     def delete_favorite(self, request, pk=None):
-        return self.delete_recipe(Favorite, request.user, pk)
+        return self.delete_recipe_from_collection(Favorite, request.user, pk)
 
     @action(
         detail=True, methods=['post'], permission_classes=[IsAuthenticated]
     )
     def shopping_cart(self, request, pk=None):
-        return self.add_recipe(Cart, request.user, pk)
+        return self.add_recipe_to_collection(Cart, request.user, pk)
 
     @shopping_cart.mapping.delete
     def delete_shopping_cart(self, request, pk=None):
-        return self.delete_recipe(Cart, request.user, pk)
+        return self.delete_recipe_from_collection(Cart, request.user, pk)
 
     @action(
         detail=False, methods=['get'], permission_classes=[IsAuthenticated]
     )
     def download_shopping_cart(self, request):
-        ingredients = (
+        shop_list = (
             IngredientAmount.objects.filter(recipe__cart__user=request.user)
             .values('ingredient__name', 'ingredient__measurement_unit')
             .annotate(ingredient_total=Sum('amount'))
             .order_by('ingredient__name')
         )
-        recipes = request.user.carts.all()
-        return generate_text(ingredients, recipes)
+        return FileResponse(
+            render_to_string(
+                'shopping_list.txt',
+                {
+                    'date': date.today().isoformat(),
+                    'shop_list': shop_list,
+                    'recipes': request.user.carts.all(),
+                },
+            ),
+            content_type='text/plain',
+            filename='cart.txt',
+        )
 
     @staticmethod
-    def add_recipe(model, user, pk):
+    def add_recipe_to_collection(model, user, pk):
         recipe = get_object_or_404(Recipe, id=pk)
-
-        if model.objects.filter(user=user, recipe=recipe).exists():
+        vebose_name = model._meta.verbose_name
+        _, created = model.objects.get_or_create(user=user, recipe=recipe)
+        if not created:
             return Response(
-                {'errors': 'Такой рецепт уже существует'},
+                {
+                    'errors':
+                    f'Рецепт {recipe.name} добавлен в список {vebose_name}'
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-        model.objects.create(user=user, recipe=recipe)
         return Response(
             CropRecipeSerializer(recipe).data, status=status.HTTP_201_CREATED
         )
 
-    def delete_recipe(self, model, user, pk):
+    def delete_recipe_from_collection(self, model, user, pk):
         model.objects.filter(id=pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -149,10 +165,10 @@ class FoodgramUserViewSet(UserViewSet):
         permission_classes=[IsAuthenticated],
     )
     def subscribe(self, request, id=None):
-        author = get_object_or_404(BaseUser, pk=id)
+        author = BaseUser.objects.filter(pk=id)
         user = request.user
         if request.method == 'DELETE':
-            Follow.objects.filter(pk=id).delete()
+            get_object_or_404(Follow, pk=id).delete()
             return Response(status=status.HTTP_200_OK)
         if user == author:
             raise ValidationError('Нельзя подписаться на самого себя!')
@@ -165,16 +181,25 @@ class FoodgramUserViewSet(UserViewSet):
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
-        user = request.user
-        queryset = user.subscriptions.all()
-        pages = self.paginate_queryset(queryset)
-        return self.get_paginated_response(FollowSerializer(pages, many=True))
+        return self.get_paginated_response(
+            FollowSerializer(
+                self.paginate_queryset(request.user.subscriptions.all()),
+                many=True,
+            )
+        )
 
     @action(detail=True, methods=['get'], url_path='get-link')
     def get_link(self, request, pk=None):
         recipe = Recipe.objects.filter(pk=pk)
         if not recipe.exists():
             return Response(
-                {'error': 'Рецепт не найден'}, status=status.HTTP_404_NOT_FOUND
+                {'error': f'Рецепт c id {pk} не найден '},
+                status=status.HTTP_404_NOT_FOUND,
             )
-        return Response({'short-link': request.build_absolute_uri(f'/s/{pk}')})
+        return Response(
+            {
+                'short-link': request.build_absolute_uri(
+                    reverse('recipe_redirect'), kwargs={'pk': pk}
+                )
+            }
+        )
