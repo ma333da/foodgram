@@ -85,7 +85,10 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source='ingredient.id')
+    id = serializers.IntegerField( 
+        validators=[MinValueValidator(MIN_AMOUNT)],
+        source='ingredient.id'
+    )
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
@@ -93,19 +96,6 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
     amount = serializers.IntegerField(
         validators=[MinValueValidator(MIN_AMOUNT)]
     )
-
-    def validate(self, data):
-        ingredient_id = self.initial_data.get('ingredient').get('id')
-        if not ingredient_id:
-            raise serializers.ValidationError(
-                {'ingredient': 'ID ингредиента не указан'}
-            )
-        if Ingredient.objects.filter(pk=ingredient_id).exists():
-            raise serializers.ValidationError(
-                {'ingredient': f'Ингредиент с id {ingredient_id} не найден'}
-            )
-
-        return data
 
     class Meta:
         model = IngredientAmount
@@ -162,13 +152,10 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     def get_is_in_shopping_cart(self, cart):
         return self._is_related(cart, Cart)
 
-    def to_representation(self, instance):
-        return super().to_representation(instance)
-
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
-    ingredients = serializers.ListField(write_only=True)
-    tags = serializers.ListField(write_only=True)
+    ingredients = IngredientAmountSerializer(write_only=True)
+    tags = TagSerializer(write_only=True, many=True)
     cooking_time = serializers.IntegerField(
         min_value=MIN_COOKING_TIME, write_only=True
     )
@@ -195,20 +182,12 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'ingredients': 'Нужен хотя бы один ингредиент для рецепта.'}
             )
-
-        ingredient_counts = {}
-        ingredient_ids = []
-
-        for ingredient_item in ingredients:
-            ingredient_id = ingredient_item.get('id')
-            ingredient_id_int = int(ingredient_id)
-            ingredient_ids.append(ingredient_id_int)
-
-            if ingredient_id_int in ingredient_counts:
-                ingredient_counts[ingredient_id_int] += 1
-            else:
-                ingredient_counts[ingredient_id_int] = 1
-        self.check_for_duplicates(ingredient_ids, 'ingridients', Ingredient)
+        
+        self.check_for_duplicates([
+            ingredient_item.get('id')
+            for ingredient_item in ingredients
+        ],'ingridients', Ingredient
+        )
         tags_ids = self.initial_data.get('tags')
         self.check_for_duplicates(tags_ids, 'tags', Tag)
         return data

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from django.contrib.auth.admin import UserAdmin
 
 from .models import (
     BaseUser,
@@ -13,7 +14,7 @@ from .models import (
 )
 
 
-class BaseAdminWithRecipeCount(admin.ModelAdmin):
+class BaseAdminWithRecipeCount(UserAdmin):
     list_display = ('recipe_count',)
 
     @admin.display(description='Рецепты')
@@ -70,7 +71,7 @@ class IngredientAdmin(BaseAdminWithRecipeCount):
         *BaseAdminWithRecipeCount.list_display,
     )
     search_fields = ('name', 'measurement_unit')
-
+    list_filter = ('measurement_unit',)
 
 @admin.register(IngredientAmount)
 class IngredientAmountAdmin(admin.ModelAdmin):
@@ -104,13 +105,11 @@ class RecipeAdmin(admin.ModelAdmin):
     def ingredients_list(self, recipe):
         return '<br>'.join(
             (
-                (
-                    f"""{ingredient_amount.ingredient.name}',
-                ({ingredient_amount.amount}
-                '{ingredient_amount.ingredient.measurement_unit})"""
-                )
-                for ingredient_amount in recipe.ingredientamounts.all()
+                f'{ingredient_amount.ingredient.name}, '
+                f'{ingredient_amount.amount} '
+                f'{ingredient_amount.ingredient.measurement_unit}'
             )
+            for ingredient_amount in recipe.ingredientamounts.all()
         )
 
     @mark_safe

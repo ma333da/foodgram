@@ -1,7 +1,7 @@
 from datetime import date
 
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from django.core.exceptions import (ValidationError, ObjectDoesNotExist)
 from django.db.models import Exists, OuterRef, Sum
 from django.http import FileResponse
 from django.template.loader import render_to_string
@@ -128,15 +128,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @staticmethod
     def add_recipe_to_collection(model, user, pk):
         recipe = get_object_or_404(Recipe, id=pk)
-        vebose_name = model._meta.verbose_name
         _, created = model.objects.get_or_create(user=user, recipe=recipe)
         if not created:
-            return Response(
+            vebose_name = model._meta.verbose_name
+            raise ValidationError(
                 {
                     'errors':
-                    f'Рецепт {recipe.name} добавлен в список {vebose_name}'
-                },
-                status=status.HTTP_400_BAD_REQUEST,
+                    f'Рецепт {recipe.name} уже добавлен в список {vebose_name}'
+                }
             )
         return Response(
             CropRecipeSerializer(recipe).data, status=status.HTTP_201_CREATED
@@ -190,16 +189,12 @@ class FoodgramUserViewSet(UserViewSet):
 
     @action(detail=True, methods=['get'], url_path='get-link')
     def get_link(self, request, pk=None):
-        recipe = Recipe.objects.filter(pk=pk)
-        if not recipe.exists():
-            return Response(
-                {'error': f'Рецепт c id {pk} не найден '},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        if Recipe.objects.filter(pk=pk).exists():
+            raise ObjectDoesNotExist({'error': f'Рецепт c id {pk} не найден'})
         return Response(
             {
                 'short-link': request.build_absolute_uri(
-                    reverse('recipe_redirect'), kwargs={'pk': pk}
+                    reverse('recipe_redirect'), args={pk}
                 )
             }
         )
