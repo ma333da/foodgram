@@ -1,4 +1,4 @@
-from recipe.models import Tag
+from ....recipe.models import Tag
 from .load_data_base import BaseDataImportCommand
 
 

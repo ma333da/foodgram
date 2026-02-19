@@ -1,12 +1,12 @@
 from datetime import date
 
 from django.contrib.auth import get_user_model
-from django.core.exceptions import (ValidationError, ObjectDoesNotExist)
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import Exists, OuterRef, Sum
 from django.http import FileResponse
 from django.template.loader import render_to_string
-from djoser.views import UserViewSet
 from django.urls import reverse
+from djoser.views import UserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404

@@ -1,4 +1,5 @@
 from recipe.models import Ingredient
+
 from .load_data_base import BaseDataImportCommand
 
 
