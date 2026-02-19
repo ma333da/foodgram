@@ -73,6 +73,7 @@ class IngredientAdmin(BaseAdminWithRecipeCount):
     search_fields = ('name', 'measurement_unit')
     list_filter = ('measurement_unit',)
 
+
 @admin.register(IngredientAmount)
 class IngredientAmountAdmin(admin.ModelAdmin):
     list_display = ('pk', 'recipe', 'ingredient', 'amount')

@@ -85,9 +85,8 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField( 
-        validators=[MinValueValidator(MIN_AMOUNT)],
-        source='ingredient.id'
+    id = serializers.IntegerField(
+        validators=[MinValueValidator(MIN_AMOUNT)], source='ingredient.id'
     )
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
@@ -182,11 +181,11 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'ingredients': 'Нужен хотя бы один ингредиент для рецепта.'}
             )
-        
-        self.check_for_duplicates([
-            ingredient_item.get('id')
-            for ingredient_item in ingredients
-        ],'ingridients', Ingredient
+
+        self.check_for_duplicates(
+            [ingredient_item.get('id') for ingredient_item in ingredients],
+            'ingridients',
+            Ingredient,
         )
         tags_ids = self.initial_data.get('tags')
         self.check_for_duplicates(tags_ids, 'tags', Tag)
