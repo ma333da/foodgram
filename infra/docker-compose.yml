@@ -12,7 +12,6 @@ services:
     image: ma333da/foodgram_backend:latest
     restart: always
     volumes:
-      - ./data/:/app/data/
       - static_value:/backend_static
       - media_value:/app/media/
     depends_on:
@@ -26,7 +25,7 @@ services:
       - frontend:/app/result_build/build/
  
   nginx:
-    image: nginx:1.19.3
+    image: ma333da/foodgram_gateway:latest
     ports:
       - 8000:80
     volumes:
