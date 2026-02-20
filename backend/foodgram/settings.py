@@ -15,9 +15,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = os.getenv("SECRET_KEY", default=get_random_secret_key())
+SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
 
-DEBUG = os.getenv("DEBUG", "False") == "True"
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'djoser',
     'corsheaders',
     'recipe',
-    'api'
+    'api',
 ]
 
 AUTH_USER_MODEL = 'recipe.BaseUser'
@@ -57,7 +57,7 @@ ROOT_URLCONF = 'foodgram.urls'
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-] 
+]
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_URLS_REGEX = r'^/api/.*$'
@@ -91,7 +91,7 @@ DATABASES = {
         'USER': os.getenv('POSTGRES_USER', 'user123'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'pass123'),
         'HOST': os.getenv('DB_HOST', 'host123'),
-        'PORT': os.getenv('DB_PORT', 5432)
+        'PORT': os.getenv('DB_PORT', 5432),
     }
 }
 
@@ -145,7 +145,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend'],
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
@@ -172,5 +173,5 @@ DJOSER = {
         'user': ['djoser.permissions.CurrentUserOrAdmin'],
         'token_create': ['rest_framework.permissions.AllowAny'],
         'token_destroy': ['rest_framework.permissions.IsAuthenticated'],
-    }
+    },
 }
