@@ -23,7 +23,7 @@ class BaseAdminWithRecipeCount(admin.ModelAdmin):
 
 
 @admin.register(BaseUser)
-class BaseUserAdmin(UserAdmin,BaseAdminWithRecipeCount):
+class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeCount):
     list_display = (
         'pk',
         'username',
@@ -72,6 +72,7 @@ class IngredientAdmin(BaseAdminWithRecipeCount):
     )
     search_fields = ('name', 'measurement_unit')
     list_filter = ('measurement_unit',)
+
 
 @admin.register(IngredientAmount)
 class IngredientAmountAdmin(admin.ModelAdmin):
