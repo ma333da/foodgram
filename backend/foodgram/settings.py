@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'djoser',
-    'corsheaders',
     'recipe',
     'api',
 ]
@@ -46,7 +45,6 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -54,13 +52,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'foodgram.urls'
-
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-]
-
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_URLS_REGEX = r'^/api/.*$'
 
 TEMPLATES = [
     {
