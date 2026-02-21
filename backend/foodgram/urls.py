@@ -13,4 +13,3 @@ urlpatterns = [
     ),
     path('recipe/', include('recipe.urls', namespace='recipe')),
 ]
-ç
