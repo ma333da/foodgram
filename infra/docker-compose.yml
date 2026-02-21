@@ -9,7 +9,7 @@ services:
       - .env
  
   backend:
-    image: ma333da/foodgram_backend:latest
+    image: ma333da/foodgram_backend
     restart: always
     volumes:
       - static_value:/backend_static
@@ -20,12 +20,12 @@ services:
       - .env 
 
   frontend:
-    image: ma333da/foodgram_frontend:latest
+    image: ma333da/foodgram_frontend
     volumes:
       - frontend:/app/result_build/build/
  
   nginx:
-    image: ma333da/foodgram_gateway:latest
+    image: ma333da/foodgram_gateway
     ports:
       - 8000:80
     volumes:
@@ -36,6 +36,7 @@ services:
     restart: always
     depends_on:
       - backend
+      - frontend
 
  
 volumes:
