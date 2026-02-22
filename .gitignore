@@ -145,3 +145,4 @@ media/
 .DS_Store
 docker-compose-dev.yaml
 infra/docker-compose-dev.yaml
+backend/.DS_Store
