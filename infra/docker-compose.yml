@@ -29,7 +29,7 @@ services:
     ports:
       - 8000:80
     volumes:
-      - ./docs/:/usr/share/nginx/html/api/docs/
+      - ../docs/:/usr/share/nginx/html/api/docs/
       - static_value:/usr/share/nginx/html/
       - media_value:/var/html/media/
       - frontend:/usr/share/nginx/html/
