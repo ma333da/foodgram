@@ -6,7 +6,7 @@
 [![Python](https://img.shields.io/badge/-Python-464646?style=flat&logo=Python&logoColor=56C0C0&color=008080)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/-Django-464646?style=flat&logo=Django&logoColor=56C0C0&color=008080)](https://www.djangoproject.com/)
 [![Nginx](https://img.shields.io/badge/-NGINX-464646?style=flat&logo=NGINX&logoColor=56C0C0&color=008080)](https://nginx.org/ru/)
-
+[![CI/CD Workflow](https://github.com/Khoetskiy/foodgram/actions/workflows/main.yml/badge.svg)](https://github.com/ma333da/foodgram/actions/workflows/main.yml) ![Star](https://img.shields.io/github/stars/Khoetskiy/foodgram?style=social)
 
 ## Команды запуска
 
