@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
+from drf_extra_fields.fields import Base64ImageField
 
 from recipe.constants import MIN_AMOUNT, MIN_COOKING_TIME
 from recipe.models import (
@@ -153,11 +154,14 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
-    ingredients = IngredientAmountSerializer(write_only=True)
-    tags = TagSerializer(write_only=True, many=True)
+    ingredients = IngredientAmountSerializer(many=True, write_only=True)
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(), many=True, write_only=True
+    )
     cooking_time = serializers.IntegerField(
         min_value=MIN_COOKING_TIME, write_only=True
     )
+    image = Base64ImageField(required=False)
 
     class Meta:
         model = Recipe
@@ -171,8 +175,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        ingredients = self.initial_data.get('ingredients')
-        image = self.initial_data.get('image')
+        ingredients = data.get('ingredients')
+        image = data.get('image')
 
         if not image:
             raise serializers.ValidationError({'image': 'Нужна картинка.'})
@@ -203,7 +207,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients')
-        tags_data = validated_data.pop('tags', [])
+        tags_data = validated_data.pop('tags')
         recipe = super().create(validated_data)
         recipe.tags.set(set(tags_data))
         self.create_ingredients(ingredients_data, recipe)
@@ -218,7 +222,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def check_for_duplicates(self, items, field_name, model):
-        if items != set(items):
+        if len(items) != len(set(items)):
             duplicate_items = {i for i in items if items.count(i) > 1}
             duplicate_names = model.objects.filter(
                 id__in=duplicate_items
