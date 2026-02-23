@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from djoser.serializers import UserSerializer
-from rest_framework import serializers
 from drf_extra_fields.fields import Base64ImageField
+from rest_framework import serializers
 
 from recipe.constants import MIN_AMOUNT, MIN_COOKING_TIME
 from recipe.models import (
