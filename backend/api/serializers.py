@@ -86,8 +86,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(validators=[MinValueValidator(MIN_AMOUNT)]
-    )
+    id = serializers.IntegerField(validators=[MinValueValidator(MIN_AMOUNT)])
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
