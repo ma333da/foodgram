@@ -1,7 +1,7 @@
 from datetime import date
 
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Sum
 from django.http import FileResponse
 from django.template.loader import render_to_string
@@ -191,7 +191,7 @@ class FoodgramUserViewSet(UserViewSet):
     @action(detail=True, methods=['get'], url_path='get-link')
     def get_link(self, request, pk=None):
         if Recipe.objects.filter(pk=pk).exists():
-            raise ObjectDoesNotExist({'error': f'Рецепт c id {pk} не найден'})
+            raise ValidationError({'error': f'Рецепт c id {pk} не найден'})
         return Response(
             {
                 'short-link': request.build_absolute_uri(

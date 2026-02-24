@@ -161,7 +161,7 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveIntegerField(
         validators=(validators.MinValueValidator(MIN_COOKING_TIME),),
-        verbose_name='Время приготовления',
+        verbose_name='Время (мин)',
     )
 
     def __str__(self):

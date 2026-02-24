@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
+from django.contrib.auth.models import User, Group
 
 from .models import (
     BaseUser,
@@ -14,7 +15,7 @@ from .models import (
 )
 
 
-class BaseAdminWithRecipeCount(admin.ModelAdmin):
+class BaseAdminWithRecipeCount:
     list_display = ('recipe_count',)
 
     @admin.display(description='Рецепты')
@@ -29,11 +30,18 @@ class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeCount):
         'username',
         'email',
         'full_name',
-        'is_staff',
         *BaseAdminWithRecipeCount.list_display,
         'avatar',
         'subscription_count',
         'follower_count',
+    )
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (
+            'Личная информация',
+            {'fields': ('first_name', 'last_name', 'email', 'avatar')},
+        ),
+        ('Права доступа', {'fields': ('is_active',)}),
     )
     search_fields = ('username', 'email')
     ordering = ('username',)
@@ -46,7 +54,7 @@ class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeCount):
     def avatar(self, user):
         if user.avatar:
             return f'<img src="{user.avatar.url}" width="50" height="50" />'
-        return '<p></p>'
+        return ''
 
     @admin.display(description='Подписки')
     def subscription_count(self, user):
@@ -58,12 +66,12 @@ class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeCount):
 
 
 @admin.register(Favorite, Cart)
-class FavoriteAdmin(admin.ModelAdmin):
+class FavoriteAndCartAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe')
 
 
 @admin.register(Ingredient)
-class IngredientAdmin(BaseAdminWithRecipeCount):
+class IngredientAdmin(BaseAdminWithRecipeCount, admin.ModelAdmin):
     list_display = (
         'pk',
         'name',
@@ -73,6 +81,10 @@ class IngredientAdmin(BaseAdminWithRecipeCount):
     search_fields = ('name', 'measurement_unit')
     list_filter = ('measurement_unit',)
 
+class IngredientAmountInline(admin.TabularInline):
+    model = IngredientAmount
+    extra = 1  
+    autocomplete_fields = ['ingredient']
 
 @admin.register(IngredientAmount)
 class IngredientAmountAdmin(admin.ModelAdmin):
@@ -92,7 +104,9 @@ class RecipeAdmin(admin.ModelAdmin):
         'tags_list',
         'image_preview',
     )
-
+    list_filter = ('author', 'tags')
+    inlines = [IngredientAmountInline]
+    
     @admin.display(description='В избранном')
     def count_favorites(self, recipe):
         return recipe.favorites.count()
@@ -106,11 +120,9 @@ class RecipeAdmin(admin.ModelAdmin):
     @admin.display(description='Ингредиенты')
     def ingredients_list(self, recipe):
         return '<br>'.join(
-            (
-                f'{ingredient_amount.ingredient.name}, '
-                f'{ingredient_amount.amount} '
-                f'{ingredient_amount.ingredient.measurement_unit}'
-            )
+            f'{ingredient_amount.ingredient.name}, '
+            f'{ingredient_amount.amount} '
+            f'{ingredient_amount.ingredient.measurement_unit}'
             for ingredient_amount in recipe.ingredientamounts.all()
         )
 
@@ -128,7 +140,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
 
 @admin.register(Tag)
-class TagAdmin(BaseAdminWithRecipeCount):
+class TagAdmin(BaseAdminWithRecipeCount, admin.ModelAdmin):
     list_display = (
         'pk',
         'name',
@@ -136,3 +148,6 @@ class TagAdmin(BaseAdminWithRecipeCount):
         *BaseAdminWithRecipeCount.list_display,
     )
     search_fields = ('name', 'slug')
+
+
+admin.site.unregister(Group)
