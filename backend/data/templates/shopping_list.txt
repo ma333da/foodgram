@@ -3,7 +3,7 @@
 
 Продукты:
 {% for item in shop_list %}
-{{ forloop.counter }}. {{ item.ingredient__name }} ({{ item.ingredient__measurement_unit }}) - {{ item.ingredient_total }}
+{{ forloop.counter }}. {{ item.ingredients__name }} ({{ item.ingredients__measurement_unit }}) - {{ item.ingredients_total }}
 {% endfor %}
 
 Рецепты:
