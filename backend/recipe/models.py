@@ -84,7 +84,9 @@ class UserRecipeRelation(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
     )
-
+    def __str__(self):
+        return f"{self.user}: {self.recipe}"
+    
     class Meta:
         abstract = True
         default_related_name = '%(class)ss'
@@ -172,6 +174,8 @@ class Recipe(models.Model):
         ),
         verbose_name='Время приготовления',
     )
+    def __str__(self):
+        return self.name
 
     class Meta:
         ordering = ('name',)
@@ -200,6 +204,8 @@ class IngredientAmount(models.Model):
         ),
         verbose_name='Количество',
     )
+    def __str__(self):
+        return f"{self.recipe}: {self.ingredient} - {self.amount}"
 
     class Meta:
         ordering = ('ingredient',)
