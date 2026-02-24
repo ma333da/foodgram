@@ -20,8 +20,7 @@ from .constants import (
 
 class BaseUser(AbstractUser):
     email = models.EmailField(
-        verbose_name='Почта',
-        unique=True, max_length=MAX_EMAIL_LENGTH
+        verbose_name='Почта', unique=True, max_length=MAX_EMAIL_LENGTH
     )
     first_name = models.CharField(
         verbose_name='Имя', max_length=MAX_FIRST_NAME_LENGTH
@@ -35,9 +34,7 @@ class BaseUser(AbstractUser):
         unique=True,
         validators=[UnicodeUsernameValidator()],
     )
-    avatar = models.ImageField(
-        upload_to='media/', verbose_name='Аватарка'
-    )
+    avatar = models.ImageField(upload_to='media/', verbose_name='Аватарка')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
@@ -84,28 +81,27 @@ class UserRecipeRelation(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
     )
+
     def __str__(self):
-        return f"{self.user}: {self.recipe}"
-    
+        return f'{self.user}: {self.recipe}'
+
     class Meta:
         abstract = True
         default_related_name = '%(class)ss'
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'recipe'],
-                name='unique_%(class)s_user_recipe'
+                fields=['user', 'recipe'], name='unique_%(class)s_user_recipe'
             )
         ]
 
 
 class Ingredient(models.Model):
     name = models.CharField(
-        max_length=MAX_INGREDIENT_NAME_LENGTH,
-        verbose_name='Название'
+        max_length=MAX_INGREDIENT_NAME_LENGTH, verbose_name='Название'
     )
     measurement_unit = models.CharField(
         max_length=MAX_MEASUREMENT_UNIT_LENGTH,
-        verbose_name='Единица измерения'
+        verbose_name='Единица измерения',
     )
 
     class Meta:
@@ -114,8 +110,7 @@ class Ingredient(models.Model):
         verbose_name_plural = 'Продукты'
         constraints = [
             models.UniqueConstraint(
-                fields=['name', 'measurement_unit'],
-                name='уникальный продукт'
+                fields=['name', 'measurement_unit'], name='уникальный продукт'
             )
         ]
 
@@ -155,8 +150,7 @@ class Recipe(models.Model):
     name = models.CharField(
         max_length=MAX_INGREDIENT_NAME_LENGTH, verbose_name='Название'
     )
-    image = models.ImageField(
-        upload_to='media/', verbose_name='Картинка')
+    image = models.ImageField(upload_to='media/', verbose_name='Картинка')
 
     text = models.TextField(verbose_name='Описание')
     ingredients = models.ManyToManyField(
@@ -167,13 +161,10 @@ class Recipe(models.Model):
         verbose_name='Теги',
     )
     cooking_time = models.PositiveIntegerField(
-        validators=(
-            validators.MinValueValidator(
-                MIN_COOKING_TIME
-            ),
-        ),
+        validators=(validators.MinValueValidator(MIN_COOKING_TIME),),
         verbose_name='Время приготовления',
     )
+
     def __str__(self):
         return self.name
 
@@ -186,26 +177,23 @@ class Recipe(models.Model):
 
 class IngredientAmount(models.Model):
     ingredient = models.ForeignKey(
-        Ingredient,
-        on_delete=models.CASCADE,
-        verbose_name='Продукт'
+        Ingredient, on_delete=models.CASCADE, verbose_name='Продукт'
     )
     recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-        verbose_name='Рецепт'
+        Recipe, on_delete=models.CASCADE, verbose_name='Рецепт'
     )
     amount = models.PositiveSmallIntegerField(
         validators=(
             validators.MinValueValidator(
                 MIN_NUM_OF_INGR,
-                message=f'Минимальное количество продуктов {MIN_NUM_OF_INGR}'
+                message=f'Минимальное количество продуктов {MIN_NUM_OF_INGR}',
             ),
         ),
         verbose_name='Количество',
     )
+
     def __str__(self):
-        return f"{self.recipe}: {self.ingredient} - {self.amount}"
+        return f'{self.recipe}: {self.ingredient} - {self.amount}'
 
     class Meta:
         ordering = ('ingredient',)
@@ -215,7 +203,7 @@ class IngredientAmount(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['ingredient', 'recipe'],
-                name='unique_%(class)s_user_recipe'
+                name='unique_%(class)s_user_recipe',
             )
         ]
 
