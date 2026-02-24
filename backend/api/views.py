@@ -33,6 +33,7 @@ from .pagination import RecipePagination
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (
     CropRecipeSerializer,
+    FoodgramUserSerializer,
     FollowersSerializer,
     FollowSerializer,
     IngredientSerializer,
@@ -126,6 +127,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
             filename='cart.txt',
         )
 
+    @action(detail=True, methods=['get'], url_path='get-link')
+    def get_link(self, request, pk=None):
+        if Recipe.objects.filter(pk=pk).exists():
+            raise ValidationError({'error': f'Рецепт c id {pk} не найден'})
+        return Response(
+            {
+                'short-link': request.build_absolute_uri(
+                    reverse('recipe_redirect'), args={pk}
+                )
+            }
+        )
+
     @staticmethod
     def add_recipe_to_collection(model, user, pk):
         recipe = get_object_or_404(Recipe, id=pk)
@@ -134,8 +147,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             vebose_name = model._meta.verbose_name
             raise ValidationError(
                 {
-                    'errors':
-                    f'Рецепт {recipe.name} уже добавлен в список {vebose_name}'
+                    'errors': f'Рецепт {recipe.name} уже добавлен в список {vebose_name}'
                 }
             )
         return Response(
@@ -188,14 +200,27 @@ class FoodgramUserViewSet(UserViewSet):
             )
         )
 
-    @action(detail=True, methods=['get'], url_path='get-link')
-    def get_link(self, request, pk=None):
-        if Recipe.objects.filter(pk=pk).exists():
-            raise ValidationError({'error': f'Рецепт c id {pk} не найден'})
+    @action(
+        detail=False,
+        methods=['put', 'delete'],
+        permission_classes=[IsAuthenticated],
+        url_path='me/avatar',
+    )
+    def avatar(self, request):
+        user = request.user
+        if request.method == 'DELETE':
+            user.avatar = None
+            user.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        serializer = FoodgramUserSerializer(
+            user,
+            data={'avatar': request.data.get('avatar')},
+            partial=True,
+            context={'request': request},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(
-            {
-                'short-link': request.build_absolute_uri(
-                    reverse('recipe_redirect'), args={pk}
-                )
-            }
+            {'avatar': user.avatar.url if user.avatar else None},
+            status=status.HTTP_200_OK,
         )
