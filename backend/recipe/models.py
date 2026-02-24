@@ -87,7 +87,7 @@ class UserRecipeRelation(models.Model):
 
     class Meta:
         abstract = True
-        default_related_name = '%(class)s'
+        default_related_name = '%(class)ss'
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'recipe'], name='unique_%(class)s_user_recipe'
@@ -172,7 +172,7 @@ class Recipe(models.Model):
         ordering = ('name',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-        default_related_name = '%(class)s'
+        default_related_name = '%(class)ss'
 
 
 class IngredientAmount(models.Model):
@@ -199,7 +199,7 @@ class IngredientAmount(models.Model):
         ordering = ('ingredient',)
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Ингридиенты'
-        default_related_name = '%(class)s'
+        default_related_name = '%(class)ss'
         constraints = [
             models.UniqueConstraint(
                 fields=['ingredient', 'recipe'],
