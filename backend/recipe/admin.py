@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Group
 from django.utils.safestring import mark_safe
-from django.contrib.auth.models import User, Group
 
 from .models import (
     BaseUser,
@@ -81,10 +81,12 @@ class IngredientAdmin(BaseAdminWithRecipeCount, admin.ModelAdmin):
     search_fields = ('name', 'measurement_unit')
     list_filter = ('measurement_unit',)
 
+
 class IngredientAmountInline(admin.TabularInline):
     model = IngredientAmount
-    extra = 1  
+    extra = 1
     autocomplete_fields = ['ingredient']
+
 
 @admin.register(IngredientAmount)
 class IngredientAmountAdmin(admin.ModelAdmin):
@@ -106,7 +108,7 @@ class RecipeAdmin(admin.ModelAdmin):
     )
     list_filter = ('author', 'tags')
     inlines = [IngredientAmountInline]
-    
+
     @admin.display(description='В избранном')
     def count_favorites(self, recipe):
         return recipe.favorites.count()

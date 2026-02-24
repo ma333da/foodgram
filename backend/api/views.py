@@ -33,9 +33,9 @@ from .pagination import RecipePagination
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (
     CropRecipeSerializer,
-    FoodgramUserSerializer,
     FollowersSerializer,
     FollowSerializer,
+    FoodgramUserSerializer,
     IngredientSerializer,
     RecipeReadSerializer,
     RecipeWriteSerializer,
@@ -147,7 +147,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             vebose_name = model._meta.verbose_name
             raise ValidationError(
                 {
-                    'errors': f'Рецепт {recipe.name} уже добавлен в список {vebose_name}'
+                    'errors':
+                    f'Рецепт {recipe.name} уже добавлен в список {vebose_name}'
                 }
             )
         return Response(
