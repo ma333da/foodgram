@@ -86,9 +86,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(
-        validators=[MinValueValidator(MIN_AMOUNT)], source='ingredient.id'
-    )
+    id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
@@ -112,7 +110,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     tags = TagSerializer(read_only=True, many=True)
     author = FoodgramUserSerializer(read_only=True)
     ingredients = IngredientAmountSerializer(
-        source='ingredientamount_set',
+        source='ingredientamounts',
         many=True,
         read_only=True,
     )
@@ -187,7 +185,10 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             )
 
         self.check_for_duplicates(
-            [ingredient_item.get('id') for ingredient_item in ingredients],
+            [
+                ingredient_item.get('ingredient').id
+                for ingredient_item in ingredients
+            ],
             'ingridients',
             Ingredient,
         )
