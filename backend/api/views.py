@@ -112,13 +112,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
             .annotate(ingredient_total=Sum('amount'))
             .order_by('ingredient__name')
         )
+        recipes = Recipe.objects.filter(carts__user=request.user).distinct()
         return FileResponse(
             render_to_string(
                 'shopping_list.txt',
                 {
                     'date': date.today().isoformat(),
                     'shop_list': shop_list,
-                    'recipes': request.user.carts.all(),
+                    'recipes': recipes,
                 },
             ),
             content_type='text/plain',
