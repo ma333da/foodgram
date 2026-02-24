@@ -186,7 +186,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
         self.check_for_duplicates(
             [
-                ingredient_item.get('ingredient').id
+                ingredient_item['id']
                 for ingredient_item in ingredients
             ],
             'ingridients',
@@ -200,7 +200,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         IngredientAmount.objects.bulk_create(
             IngredientAmount(
                 recipe=recipe,
-                ingredient_id=ingredient.get('id'),
+                ingredient_id=ingredient['id'],
                 amount=ingredient.get('amount'),
             )
             for ingredient in ingredients
