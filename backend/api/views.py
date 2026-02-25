@@ -172,7 +172,7 @@ class FoodgramUserViewSet(UserViewSet):
         permission_classes=[IsAuthenticated],
     )
     def subscribe(self, request, id=None):
-        author = BaseUser.objects.filter(pk=id)
+        author = get_object_or_404(BaseUser, pk=id)
         user = request.user
         if request.method == 'DELETE':
             get_object_or_404(Follow, pk=id).delete()
