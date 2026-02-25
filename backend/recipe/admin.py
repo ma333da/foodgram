@@ -49,7 +49,7 @@ class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeCount):
     @admin.display(description='ФИО')
     def full_name(self, user):
         return f'{user.first_name} {user.last_name}'
-    
+
     @admin.display(description='Аватар')
     @mark_safe
     def avatar(self, user):
