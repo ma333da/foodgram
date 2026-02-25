@@ -30,10 +30,10 @@ class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeCount):
         'username',
         'email',
         'full_name',
-        *BaseAdminWithRecipeCount.list_display,
-        'avatar',
         'subscription_count',
         'follower_count',
+        *BaseAdminWithRecipeCount.list_display,
+        'image'
     )
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
@@ -50,9 +50,9 @@ class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeCount):
     def full_name(self, user):
         return f'{user.first_name} {user.last_name}'
 
-    @admin.display(description='Аватар')
     @mark_safe
-    def avatar(self, user):
+    @admin.display(description='Аватар')
+    def image(self, user):
         if user.avatar:
             return f'<img src="{user.avatar.url}" width="50" height="50"/>'
         return ''

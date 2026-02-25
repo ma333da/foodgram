@@ -186,7 +186,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
         self.check_for_duplicates(
             [ingredient_item['id'] for ingredient_item in ingredients],
-            'ingridients',
+            'ingredients',
             Ingredient,
         )
         tags_ids = self.initial_data.get('tags')
