@@ -5,7 +5,6 @@ from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Sum
 from django.http import FileResponse
 from django.template.loader import render_to_string
-from django.urls import reverse
 from djoser.views import UserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -131,12 +130,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_link(self, request, pk=None):
         if not Recipe.objects.filter(pk=pk).exists():
             raise ValidationError({'error': f'Рецепт c id {pk} не найден'})
-        return Response(
-            {
-                'short-link': 
-                request.build_absolute_uri(f"/s/{pk}")
-            }
-        )
+        return Response({'short-link': request.build_absolute_uri(f'/s/{pk}')})
 
     @staticmethod
     def add_recipe_to_collection(model, user, pk):
