@@ -21,8 +21,8 @@ class BaseDataImportCommand(BaseCommand):
         try:
             with open(Path(DATA_ROOT) / filename, 'r', encoding='utf-8') as f:
                 create_objects = self.model.objects.bulk_create(
-                list(map(lambda x: self.model(**x), json.load(f))),
-                ignore_conflicts=True
+                    list(map(lambda x: self.model(**x), json.load(f))),
+                    ignore_conflicts=True,
                 )
                 self.stdout.write(
                     self.style.SUCCESS(
