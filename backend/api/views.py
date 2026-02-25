@@ -194,7 +194,7 @@ class FoodgramUserViewSet(UserViewSet):
                     BaseUser.objects.filter(authors__user=request.user)
                 ),
                 many=True,
-            )
+            ).data
         )
 
     @action(
