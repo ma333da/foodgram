@@ -34,7 +34,12 @@ class BaseUser(AbstractUser):
         unique=True,
         validators=[UnicodeUsernameValidator()],
     )
-    avatar = models.ImageField(upload_to='media/', verbose_name='Аватарка')
+    avatar = models.ImageField(
+        upload_to='media/',
+        verbose_name='Аватарка',
+        null=True,
+        blank=True,
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']

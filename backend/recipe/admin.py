@@ -53,8 +53,8 @@ class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeCount):
     @admin.display(description='Аватар')
     @mark_safe
     def avatar(self, user):
-        if user.image:
-            return f'<img src="{user.image.url}" width="50" height="50"/>'
+        if user.avatar:
+            return f'<img src="{user.avatar.url}" width="50" height="50"/>'
         return ''
 
     @admin.display(description='Подписки')
