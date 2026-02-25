@@ -229,6 +229,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {field_name: f'Повторяющиеся {field_name}: {duplicate_names}'}
             )
-            
+
     def to_representation(self, instance):
         return RecipeReadSerializer(instance, context=self.context).data
