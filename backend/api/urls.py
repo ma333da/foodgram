@@ -13,7 +13,7 @@ app_name = 'api'
 router = DefaultRouter()
 
 router.register('ingredients', IngredientsViewSet)
-router.register('recipes', RecipeViewSet)
+router.register('recipes', RecipeViewSet, basename='recipe')
 router.register('tags', TagViewSet)
 router.register('users', FoodgramUserViewSet)
 

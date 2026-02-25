@@ -14,7 +14,7 @@ from .constants import (
     MAX_TAG_NAME_LENGTH,
     MAX_USERNAME_LENGTH,
     MIN_COOKING_TIME,
-    MIN_NUM_OF_INGR,
+    MIN_AMOUNT,
 )
 
 
@@ -184,8 +184,8 @@ class IngredientAmount(models.Model):
     amount = models.PositiveSmallIntegerField(
         validators=(
             validators.MinValueValidator(
-                MIN_NUM_OF_INGR,
-                message=f'Минимальное количество продуктов {MIN_NUM_OF_INGR}',
+                MIN_AMOUNT,
+                message=f'Минимальное количество продуктов {MIN_AMOUNT}',
             ),
         ),
         verbose_name='Количество',

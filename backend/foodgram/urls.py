@@ -3,13 +3,6 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path(
-        'api/',
-        include(
-            [
-                path('', include('api.urls')),
-            ]
-        ),
-    ),
-    path('recipe/', include('recipe.urls', namespace='recipe')),
+    path('api/', include('api.urls'),),
+    path('s/<int:recipe_id>/', include('recipe.urls', namespace='recipe')),
 ]

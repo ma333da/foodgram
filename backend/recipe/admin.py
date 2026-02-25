@@ -52,8 +52,8 @@ class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeCount):
 
     @mark_safe
     def avatar(self, user):
-        if user.avatar:
-            return f'<img src="{user.avatar.url}" width="50" height="50" />'
+        if user.image:
+            return f'<img src="{user.image.url}" width="50" height="50"/>'
         return ''
 
     @admin.display(description='Подписки')
@@ -128,6 +128,7 @@ class RecipeAdmin(admin.ModelAdmin):
             for ingredient_amount in recipe.ingredientamounts.all()
         )
 
+    @admin.display(description='Картинка')
     @mark_safe
     def image_preview(self, recipe):
         if recipe.image:
