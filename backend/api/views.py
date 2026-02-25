@@ -209,7 +209,7 @@ class FoodgramUserViewSet(UserViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         serializer = FoodgramUserSerializer(
             user,
-            data={'avatar': request.FILES.get('avatar')},
+            data={'avatar': request.data.get('avatar')},
             partial=True,
             context={'request': request},
         )

@@ -20,7 +20,7 @@ User = get_user_model()
 
 class FoodgramUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
-
+    avatar = Base64ImageField(required=False)
     class Meta:
         model = User
         fields = (*UserSerializer.Meta.fields, 'is_subscribed', 'avatar')
