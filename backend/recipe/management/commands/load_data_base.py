@@ -4,7 +4,7 @@ from pathlib import Path
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-DATA_ROOT = settings.BASE_DIR / "data"
+DATA_ROOT = settings.BASE_DIR / 'data'
 
 
 class BaseDataImportCommand(BaseCommand):
@@ -13,24 +13,22 @@ class BaseDataImportCommand(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "filename", default=self.default_filename, nargs="?", type=str
+            'filename', default=self.default_filename, nargs='?', type=str
         )
 
     def handle(self, *args, **options):
-        filename = options["filename"]
+        filename = options['filename']
         try:
-            with open(Path(DATA_ROOT) / filename, "r", encoding="utf-8") as f:
+            with open(Path(DATA_ROOT) / filename, 'r', encoding='utf-8') as f:
                 create_objects = self.model.objects.bulk_create(
-                    (
-                        self.model(**item)  # type: ignore
-                        for item in json.load(f)
-                    ), ignore_conflicts=True
+                list(map(lambda x: self.model(**x), json.load(f))),
+                ignore_conflicts=True
                 )
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f"Данныe из файла {filename} успешно импортированы."
-                        f"Импортировано - {len(create_objects)} шт."
+                        f'Данныe из файла {filename} успешно импортированы.'
+                        f'Импортировано - {len(create_objects)} шт.'
                     )
                 )
         except Exception as e:
-            raise CommandError(f"Произошла ошибка: {e} в файле {filename}.")
+            raise CommandError(f'Произошла ошибка: {e} в файле {filename}.')

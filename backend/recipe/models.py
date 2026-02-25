@@ -13,8 +13,8 @@ from .constants import (
     MAX_SLUG_LENGTH,
     MAX_TAG_NAME_LENGTH,
     MAX_USERNAME_LENGTH,
-    MIN_COOKING_TIME,
     MIN_AMOUNT,
+    MIN_COOKING_TIME,
 )
 
 
