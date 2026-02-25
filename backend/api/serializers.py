@@ -24,7 +24,7 @@ class FoodgramUserSerializer(UserSerializer):
 
     class Meta:
         model = User
-        fields = (*UserSerializer.Meta.fields, 'is_subscribed', 'avatar')
+        fields = (*UserSerializer.Meta.fields, 'is_subscribed')
         read_only_fields = fields
 
     def get_is_subscribed(self, author):
