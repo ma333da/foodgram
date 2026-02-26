@@ -1,4 +1,5 @@
 from datetime import date
+import locale
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -117,7 +118,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             render_to_string(
                 'shopping_list.txt',
                 {
-                    'date': date.today().isoformat(),
+                    'date': date.today().strftime("%d %B %Y"),
                     'shop_list': shop_list,
                     'recipes': recipes,
                 },

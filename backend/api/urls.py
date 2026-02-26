@@ -12,10 +12,10 @@ app_name = 'api'
 
 router = DefaultRouter()
 
-router.register('ingredients', IngredientsViewSet)
+router.register('ingredients', IngredientsViewSet, basename='ingredient')
 router.register('recipes', RecipeViewSet, basename='recipe')
-router.register('tags', TagViewSet)
-router.register('users', FoodgramUserViewSet)
+router.register('tags', TagViewSet, basename='tag')
+router.register('users', FoodgramUserViewSet, basename='user')
 
 urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),

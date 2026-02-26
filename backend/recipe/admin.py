@@ -39,7 +39,7 @@ class BaseUserAdmin(UserAdmin, Mixin):
         (None, {'fields': ('username', 'password')}),
         (
             'Личная информация',
-            {'fields': ('first_name', 'last_name', 'email', 'avatar')},
+            {'fields': ('first_name', 'last_name', 'email', 'image')},
         ),
         ('Права доступа', {'fields': ('is_active',)}),
     )
@@ -68,12 +68,13 @@ class BaseUserAdmin(UserAdmin, Mixin):
 
 @admin.register(Favorite, Cart)
 class FavoriteAndCartAdmin(admin.ModelAdmin):
-    list_display = ('user', 'recipe')
+    list_display = ('pk', 'user', 'recipe')
 
 
 @admin.register(Ingredient)
 class IngredientAdmin(Mixin, admin.ModelAdmin):
     list_display = (
+        'id',
         'pk',
         'name',
         'measurement_unit',
