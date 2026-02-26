@@ -33,7 +33,6 @@ from .permissions import IsOwnerOrReadOnly
 from .serializers import (
     CropRecipeSerializer,
     FollowersSerializer,
-    FollowSerializer,
     FoodgramUserSerializer,
     IngredientSerializer,
     RecipeReadSerializer,
@@ -176,6 +175,7 @@ class FoodgramUserViewSet(UserViewSet):
         user = request.user
         if request.method == 'DELETE':
             follow = get_object_or_404(Follow, user=user, author=author)
+            follow.delete()
             return Response(status=status.HTTP_200_OK)
         if user == author:
             raise ValidationError('Нельзя подписаться на самого себя!')
