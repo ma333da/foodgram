@@ -181,7 +181,10 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         if ingredients is not None:
             if is_create and not ingredients:
                 raise serializers.ValidationError(
-                    {'ingredients': 'Нужен хотя бы один ингредиент для рецепта.'}
+                    {
+                        'ingredients':
+                        'Нужен хотя бы один ингредиент для рецепта.'
+                    }
                 )
             self.check_for_duplicates(
                 [ingredient_item['id'] for ingredient_item in ingredients],
