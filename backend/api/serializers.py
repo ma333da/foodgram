@@ -20,7 +20,7 @@ User = get_user_model()
 
 class FoodgramUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
-    avatar = Base64ImageField(required=False)
+    # avatar = Base64ImageField(required=False)
 
     class Meta:
         model = User
@@ -215,18 +215,14 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        if 'image' in validated_data and validated_data['image'] is not None:
-            instance.image = validated_data['image']
+        # instance.image = validated_data['image']
         tags_data = validated_data.pop('tags')
-        if tags_data is None:
-            tags_data = self.initial_data.get('tags')
-        if tags_data is not None:
-            instance.tags.clear()
-            instance.tags.set(tags_data)
+        tags_data = self.initial_data.get('tags')
+        instance.tags.clear()
+        instance.tags.set(tags_data)
         ingredients_data = validated_data.pop('ingredients')
-        if ingredients_data is not None:
-            instance.ingredientamounts.all().delete()
-            self.create_ingredients(ingredients_data, instance)
+        instance.ingredientamounts.all().delete()
+        self.create_ingredients(ingredients_data, instance)
         return super().update(instance, validated_data)
 
     def check_for_duplicates(self, items, field_name, model):

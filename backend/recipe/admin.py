@@ -15,7 +15,7 @@ from .models import (
 )
 
 
-class BaseAdminWithRecipeCount:
+class Mixin:
     list_display = ('recipe_count',)
 
     @admin.display(description='Рецепты')
@@ -24,7 +24,7 @@ class BaseAdminWithRecipeCount:
 
 
 @admin.register(BaseUser)
-class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeCount):
+class BaseUserAdmin(UserAdmin, Mixin):
     list_display = (
         'pk',
         'username',
@@ -32,7 +32,7 @@ class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeCount):
         'full_name',
         'subscription_count',
         'follower_count',
-        *BaseAdminWithRecipeCount.list_display,
+        *Mixin.list_display,
         'image'
     )
     fieldsets = (
@@ -72,12 +72,12 @@ class FavoriteAndCartAdmin(admin.ModelAdmin):
 
 
 @admin.register(Ingredient)
-class IngredientAdmin(BaseAdminWithRecipeCount, admin.ModelAdmin):
+class IngredientAdmin(Mixin, admin.ModelAdmin):
     list_display = (
         'pk',
         'name',
         'measurement_unit',
-        *BaseAdminWithRecipeCount.list_display,
+        *Mixin.list_display,
     )
     search_fields = ('name', 'measurement_unit')
     list_filter = ('measurement_unit',)
@@ -144,12 +144,12 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
 
 @admin.register(Tag)
-class TagAdmin(BaseAdminWithRecipeCount, admin.ModelAdmin):
+class TagAdmin(Mixin, admin.ModelAdmin):
     list_display = (
         'pk',
         'name',
         'slug',
-        *BaseAdminWithRecipeCount.list_display,
+        *Mixin.list_display,
     )
     search_fields = ('name', 'slug')
 

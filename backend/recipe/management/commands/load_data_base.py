@@ -20,14 +20,14 @@ class BaseDataImportCommand(BaseCommand):
         filename = options['filename']
         try:
             with open(Path(DATA_ROOT) / filename, 'r', encoding='utf-8') as f:
-                create_objects = self.model.objects.bulk_create(
-                    list(map(lambda x: self.model(**x), json.load(f))),
+                created_objects = self.model.objects.bulk_create(
+                   self.model(**json.load(f)), # type: ignore
                     ignore_conflicts=True,
                 )
                 self.stdout.write(
                     self.style.SUCCESS(
                         f'Данныe из файла {filename} успешно импортированы.'
-                        f'Импортировано - {len(create_objects)} шт.'
+                        f'Импортировано - {len(created_objects)} шт.'
                     )
                 )
         except Exception as e:
