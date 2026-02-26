@@ -28,13 +28,11 @@ class FoodgramUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, author):
         request = self.context.get('request')
-        return (
-            request is not None
-            or not request.user.is_anonymous
-            and Follow.objects.filter(
-                user=request.user, author=author
-            ).exists()
-        )
+        if request is None or not request.user.is_authenticated:
+            return False
+        return Follow.objects.filter(
+            user=request.user, author=author
+        ).exists()
 
 
 class CropRecipeSerializer(serializers.ModelSerializer):
@@ -66,10 +64,10 @@ class FollowersSerializer(FoodgramUserSerializer):
         )
         read_only_fields = fields
 
-    def get_recipes(self, recipe):
+    def get_recipes(self, author):
         request = self.context.get('request')
         limit = request.query_params.get('recipes_limit')
-        qs = Recipe.objects.filter(author=recipe.author)
+        qs = Recipe.objects.filter(author=author)
 
         if limit:
             try:
@@ -159,7 +157,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
     cooking_time = serializers.IntegerField(
         min_value=MIN_COOKING_TIME, write_only=True
     )
-    image = Base64ImageField(required=True)
+    image = Base64ImageField(required=False)
 
     class Meta:
         model = Recipe
@@ -175,22 +173,24 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
     def validate(self, data):
         ingredients = data.get('ingredients')
         image = data.get('image')
+        is_create = self.instance is None
 
-        if not image:
+        if is_create and not image:
             raise serializers.ValidationError({'image': 'Нужна картинка.'})
 
-        if not ingredients:
-            raise serializers.ValidationError(
-                {'ingredients': 'Нужен хотя бы один ингредиент для рецепта.'}
+        if ingredients is not None:
+            if is_create and not ingredients:
+                raise serializers.ValidationError(
+                    {'ingredients': 'Нужен хотя бы один ингредиент для рецепта.'}
+                )
+            self.check_for_duplicates(
+                [ingredient_item['id'] for ingredient_item in ingredients],
+                'ingredients',
+                Ingredient,
             )
-
-        self.check_for_duplicates(
-            [ingredient_item['id'] for ingredient_item in ingredients],
-            'ingredients',
-            Ingredient,
-        )
         tags_ids = self.initial_data.get('tags')
-        self.check_for_duplicates(tags_ids, 'tags', Tag)
+        if tags_ids is not None:
+            self.check_for_duplicates(tags_ids, 'tags', Tag)
         return data
 
     def create_ingredients(self, ingredients, recipe):
@@ -212,13 +212,18 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        if 'image' in validated_data:
+        if 'image' in validated_data and validated_data['image'] is not None:
             instance.image = validated_data['image']
-        instance.tags.clear()
-        tags_data = self.initial_data.get('tags')
-        instance.tags.set(tags_data)
-        instance.ingredientamounts.all().delete()
-        self.create_ingredients(validated_data.get('ingredients'), instance)
+        tags_data = validated_data.get('tags')
+        if tags_data is None:
+            tags_data = self.initial_data.get('tags')
+        if tags_data is not None:
+            instance.tags.clear()
+            instance.tags.set(tags_data)
+        ingredients_data = validated_data.get('ingredients')
+        if ingredients_data is not None:
+            instance.ingredientamounts.all().delete()
+            self.create_ingredients(ingredients_data, instance)
         return super().update(instance, validated_data)
 
     def check_for_duplicates(self, items, field_name, model):
