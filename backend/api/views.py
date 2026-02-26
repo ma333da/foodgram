@@ -150,7 +150,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
     def delete_recipe_from_collection(self, model, user, pk):
-        model.objects.filter(id=pk).delete()
+        model.objects.filter(user=user, recipe_id=pk).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -171,31 +171,37 @@ class FoodgramUserViewSet(UserViewSet):
         methods=['post', 'delete'],
         permission_classes=[IsAuthenticated],
     )
-    def subscribe(self, request, id=None):
-        author = get_object_or_404(BaseUser, pk=id)
+    def subscribe(self, request, pk=None):
+        author = get_object_or_404(BaseUser, pk=pk)
         user = request.user
         if request.method == 'DELETE':
-            get_object_or_404(Follow, pk=id).delete()
+            follow = get_object_or_404(Follow, user=user, author=author)
             return Response(status=status.HTTP_200_OK)
         if user == author:
             raise ValidationError('Нельзя подписаться на самого себя!')
         _, created = Follow.objects.get_or_create(user=user, author=author)
         if not created:
-            raise ValidationError(f'Вы уже подписаны на пользователя {user}!')
+            raise ValidationError(
+                f'Вы уже подписаны на пользователя {author.username}!'
+            )
         return Response(
-            FollowersSerializer(_).data, status=status.HTTP_201_CREATED
+            FollowersSerializer(author, context={'request': request}).data,
+            status=status.HTTP_201_CREATED,
         )
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
-        return self.get_paginated_response(
-            FollowSerializer(
-                self.paginate_queryset(
-                    BaseUser.objects.filter(authors__user=request.user)
-                ),
-                many=True,
-            ).data
+        authors = BaseUser.objects.filter(authors__user=request.user)
+        page = self.paginate_queryset(authors)
+        if page is not None:
+            serializer = FollowersSerializer(
+                page, many=True, context={'request': request}
+            )
+            return self.get_paginated_response(serializer.data)
+        serializer = FollowersSerializer(
+            authors, many=True, context={'request': request}
         )
+        return Response(serializer.data)
 
     @action(
         detail=False,
@@ -211,13 +217,16 @@ class FoodgramUserViewSet(UserViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         serializer = FoodgramUserSerializer(
             user,
-            data={'avatar': request.data},
+            data=request.data,
             partial=True,
-            context={'request': request},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        user.refresh_from_db()
+        avatar_url = None
+        if user.avatar:
+            avatar_url = request.build_absolute_uri(user.avatar.url)
         return Response(
-            {'avatar': user.avatar.url if user.avatar else None},
+            {'avatar': avatar_url},
             status=status.HTTP_200_OK,
         )

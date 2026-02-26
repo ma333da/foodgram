@@ -217,13 +217,13 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if 'image' in validated_data and validated_data['image'] is not None:
             instance.image = validated_data['image']
-        tags_data = validated_data.get('tags')
+        tags_data = validated_data.pop('tags')
         if tags_data is None:
             tags_data = self.initial_data.get('tags')
         if tags_data is not None:
             instance.tags.clear()
             instance.tags.set(tags_data)
-        ingredients_data = validated_data.get('ingredients')
+        ingredients_data = validated_data.pop('ingredients')
         if ingredients_data is not None:
             instance.ingredientamounts.all().delete()
             self.create_ingredients(ingredients_data, instance)
