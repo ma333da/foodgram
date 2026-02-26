@@ -41,6 +41,8 @@ from .serializers import (
     TagSerializer,
 )
 
+locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
+
 BaseUser = get_user_model()
 
 
@@ -118,7 +120,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             render_to_string(
                 'shopping_list.txt',
                 {
-                    'date': date.today().strftime("%d %B %Y"),
+                    'date': date.today().strftime('%d %B %Y'),
                     'shop_list': shop_list,
                     'recipes': recipes,
                 },
@@ -171,8 +173,8 @@ class FoodgramUserViewSet(UserViewSet):
         methods=['post', 'delete'],
         permission_classes=[IsAuthenticated],
     )
-    def subscribe(self, request, pk=None):
-        author = get_object_or_404(BaseUser, pk=pk)
+    def subscribe(self, request, id=None):
+        author = get_object_or_404(BaseUser, pk=id)
         user = request.user
         if request.method == 'DELETE':
             follow = get_object_or_404(Follow, user=user, author=author)
