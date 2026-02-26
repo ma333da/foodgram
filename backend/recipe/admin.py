@@ -33,18 +33,27 @@ class BaseUserAdmin(UserAdmin, Mixin):
         'subscription_count',
         'follower_count',
         *Mixin.list_display,
-        'image'
+        'image_preview',
     )
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (
             'Личная информация',
-            {'fields': ('first_name', 'last_name', 'email', 'image')},
+            {
+                'fields': (
+                    'first_name',
+                    'last_name',
+                    'email',
+                    'avatar',
+                    'image_preview',
+                )
+            },
         ),
         ('Права доступа', {'fields': ('is_active',)}),
     )
     search_fields = ('username', 'email')
     ordering = ('username',)
+    readonly_fields = ('image_preview',)
 
     @admin.display(description='ФИО')
     def full_name(self, user):
@@ -52,7 +61,7 @@ class BaseUserAdmin(UserAdmin, Mixin):
 
     @mark_safe
     @admin.display(description='Аватар')
-    def image(self, user):
+    def image_preview(self, user):
         if user.avatar:
             return f'<img src="{user.avatar.url}" width="50" height="50"/>'
         return ''
@@ -110,6 +119,31 @@ class RecipeAdmin(admin.ModelAdmin):
     )
     list_filter = ('author', 'tags')
     inlines = [IngredientAmountInline]
+    fieldsets = (
+        (
+            'Основное',
+            {
+                'fields': (
+                    'name',
+                    'text',
+                    'cooking_time',
+                    'author',
+                )
+            },
+        ),
+        (
+            'Изображение',
+            {
+                'fields': (
+                    'image',
+                    'image_preview'
+                    
+                )
+            },
+        ),
+        ('Теги и ингредиенты', {'fields': ('tags',)}),
+    )
+    readonly_fields=('image_preview',)
 
     @admin.display(description='В избранном')
     def count_favorites(self, recipe):
