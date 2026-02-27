@@ -79,7 +79,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        queryset = (
+        recipes_queryset = (
             Recipe.objects.all().select_related('author')
         )
 
@@ -90,12 +90,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             is_in_shopping_cart_annotation = Exists(
                 Cart.objects.filter(user=user, recipe=OuterRef('pk'))
             )
-            queryset = queryset.annotate(
+            queryset = recipes_queryset.annotate(
                 is_favorited=is_favorite_annotation,
                 is_in_shopping_cart=is_in_shopping_cart_annotation,
             )
 
-        return queryset.order_by('-id')
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -197,8 +197,8 @@ class FoodgramUserViewSet(UserViewSet):
             return Response(status=status.HTTP_200_OK)
         if user.pk == id:
             raise ValidationError('Нельзя подписаться на самого себя!')
-        _, created = Follow.objects.get_or_create(user=user, author_id=id)
         author = get_object_or_404(BaseUser, pk=id)
+        _, created = Follow.objects.get_or_create(user=user, author=author)
         if not created:
             raise ValidationError(
                 f'Вы уже подписаны на пользователя {author.username}!'

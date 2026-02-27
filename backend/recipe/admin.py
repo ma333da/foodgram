@@ -73,7 +73,7 @@ class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeMixin):
     @admin.display(description='Подписчики')
     def follower_count(self, user):
         return user.authors.count()
-
+    
 
 @admin.register(Favorite, Cart)
 class FavoriteAndCartAdmin(admin.ModelAdmin):
@@ -96,15 +96,13 @@ class IngredientAdmin(BaseAdminWithRecipeMixin, admin.ModelAdmin):
 class IngredientAmountInline(admin.TabularInline):
     model = IngredientAmount
     extra = 1
-    autocomplete_fields = [
-        'ingredient',
-    ]
+    autocomplete_fields = ['ingredient']
     readonly_fields = ('measurement_unit',)
     fields = ('ingredient', 'amount', 'measurement_unit')
 
     @admin.display(description='Единицы измерения')
-    def measurement_unit(self, recipe):
-        return recipe.ingredient.measurement_unit
+    def measurement_unit(self, ingredient_amount):
+        return ingredient_amount.ingredient.measurement_unit
 
 
 @admin.register(IngredientAmount)
@@ -113,9 +111,9 @@ class IngredientAmountAdmin(admin.ModelAdmin):
     list_filter = ('amount',)
 
     @admin.display(description='Единицы измерения')
-    def measurement_unit(self, recipe):
-        return recipe.ingredient.measurement_unit
-
+    def measurement_unit(self, ingredient_amount):
+        return ingredient_amount.ingredient.measurement_unit
+    
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):

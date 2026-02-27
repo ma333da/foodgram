@@ -173,7 +173,7 @@ class Recipe(models.Model):
         return self.name
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('-id',)
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         default_related_name = '%(class)ss'
@@ -201,7 +201,7 @@ class IngredientAmount(models.Model):
 
     class Meta:
         ordering = ('ingredient',)
-        verbose_name = 'Продукт'
+        verbose_name = 'Продукт в рецепте'
         verbose_name_plural = 'Продукты в рецепте'
         default_related_name = '%(class)ss'
         constraints = [
