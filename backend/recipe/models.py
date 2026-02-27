@@ -201,7 +201,7 @@ class IngredientAmount(models.Model):
 
     class Meta:
         ordering = ('ingredient',)
-        verbose_name = 'Ингридиент'
+        verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты в рецепте'
         default_related_name = '%(class)ss'
         constraints = [

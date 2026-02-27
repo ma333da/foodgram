@@ -213,9 +213,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        # instance.image = validated_data['image']
         tags_data = validated_data.pop('tags')
-        tags_data = self.initial_data.get('tags')
         instance.tags.clear()
         instance.tags.set(tags_data)
         ingredients_data = validated_data.pop('ingredients')

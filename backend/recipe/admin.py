@@ -15,7 +15,7 @@ from .models import (
 )
 
 
-class Mixin:
+class BaseAdminWithRecipeMixin:
     list_display = ('recipe_count',)
 
     @admin.display(description='Рецепты')
@@ -24,7 +24,7 @@ class Mixin:
 
 
 @admin.register(BaseUser)
-class BaseUserAdmin(UserAdmin, Mixin):
+class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeMixin):
     list_display = (
         'pk',
         'username',
@@ -32,7 +32,7 @@ class BaseUserAdmin(UserAdmin, Mixin):
         'full_name',
         'subscription_count',
         'follower_count',
-        *Mixin.list_display,
+        *BaseAdminWithRecipeMixin.list_display,
         'image_preview',
     )
     fieldsets = (
@@ -81,13 +81,13 @@ class FavoriteAndCartAdmin(admin.ModelAdmin):
 
 
 @admin.register(Ingredient)
-class IngredientAdmin(Mixin, admin.ModelAdmin):
+class IngredientAdmin(BaseAdminWithRecipeMixin, admin.ModelAdmin):
     list_display = (
         'id',
         'pk',
         'name',
         'measurement_unit',
-        *Mixin.list_display,
+        *BaseAdminWithRecipeMixin.list_display,
     )
     search_fields = ('name', 'measurement_unit')
     list_filter = ('measurement_unit',)
@@ -102,16 +102,19 @@ class IngredientAmountInline(admin.TabularInline):
     readonly_fields = ('measurement_unit',)
     fields = ('ingredient', 'amount', 'measurement_unit')
 
-    def measurement_unit(self, obj):
-        if obj.ingredient and obj.ingredient.measurement_unit:
-            return obj.ingredient.measurement_unit
-        return '—'
+    @admin.display(description='Единицы измерения')
+    def measurement_unit(self, recipe):
+        return recipe.ingredient.measurement_unit
 
 
 @admin.register(IngredientAmount)
 class IngredientAmountAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'recipe', 'ingredient', 'amount')
+    list_display = ('pk', 'recipe', 'ingredient', 'amount', 'measurement_unit')
     list_filter = ('amount',)
+
+    @admin.display(description='Единицы измерения')
+    def measurement_unit(self, recipe):
+        return recipe.ingredient.measurement_unit
 
 
 @admin.register(Recipe)
@@ -182,12 +185,12 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
 
 @admin.register(Tag)
-class TagAdmin(Mixin, admin.ModelAdmin):
+class TagAdmin(BaseAdminWithRecipeMixin, admin.ModelAdmin):
     list_display = (
         'pk',
         'name',
         'slug',
-        *Mixin.list_display,
+        *BaseAdminWithRecipeMixin.list_display,
     )
     search_fields = ('name', 'slug')
 

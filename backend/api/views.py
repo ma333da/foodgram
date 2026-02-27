@@ -41,9 +41,18 @@ from .serializers import (
 )
 
 months = {
-    1: 'января', 2: 'февраля', 3: 'марта', 4: 'апреля',
-    5: 'мая', 6: 'июня', 7: 'июля', 8: 'августа',
-    9: 'сентября', 10: 'октября', 11: 'ноября', 12: 'декабря'
+    1: 'января',
+    2: 'февраля',
+    3: 'марта',
+    4: 'апреля',
+    5: 'мая',
+    6: 'июня',
+    7: 'июля',
+    8: 'августа',
+    9: 'сентября',
+    10: 'октября',
+    11: 'ноября',
+    12: 'декабря',
 }
 
 
@@ -71,7 +80,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = (
-            Recipe.objects.all().select_related('author').order_by('-id')
+            Recipe.objects.all().select_related('author')
         )
 
         if user.is_authenticated:
@@ -86,7 +95,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 is_in_shopping_cart=is_in_shopping_cart_annotation,
             )
 
-        return queryset
+        return queryset.order_by('-id')
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -127,7 +136,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             render_to_string(
                 'shopping_list.txt',
                 {
-                    'date': f"{today.day} {months[today.month]} {today.year}",
+                    'date': f'{today.day} {months[today.month]} {today.year}',
                     'shop_list': shop_list,
                     'recipes': recipes,
                 },
@@ -181,15 +190,15 @@ class FoodgramUserViewSet(UserViewSet):
         permission_classes=[IsAuthenticated],
     )
     def subscribe(self, request, id=None):
-        author = get_object_or_404(BaseUser, pk=id)
         user = request.user
         if request.method == 'DELETE':
-            follow = get_object_or_404(Follow, user=user, author=author)
+            follow = get_object_or_404(Follow, user=user, author_id=id)
             follow.delete()
             return Response(status=status.HTTP_200_OK)
-        if user == author:
+        if user.pk == id:
             raise ValidationError('Нельзя подписаться на самого себя!')
-        _, created = Follow.objects.get_or_create(user=user, author=author)
+        _, created = Follow.objects.get_or_create(user=user, author_id=id)
+        author = get_object_or_404(BaseUser, pk=id)
         if not created:
             raise ValidationError(
                 f'Вы уже подписаны на пользователя {author.username}!'
@@ -203,15 +212,11 @@ class FoodgramUserViewSet(UserViewSet):
     def subscriptions(self, request):
         authors = BaseUser.objects.filter(authors__user=request.user)
         page = self.paginate_queryset(authors)
-        if page is not None:
-            serializer = FollowersSerializer(
+        return self.get_paginated_response(
+            FollowersSerializer(
                 page, many=True, context={'request': request}
-            )
-            return self.get_paginated_response(serializer.data)
-        serializer = FollowersSerializer(
-            authors, many=True, context={'request': request}
+            ).data
         )
-        return Response(serializer.data)
 
     @action(
         detail=False,
