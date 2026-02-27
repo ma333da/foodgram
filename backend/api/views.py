@@ -1,4 +1,3 @@
-import locale
 from datetime import date
 
 from django.contrib.auth import get_user_model
@@ -41,7 +40,12 @@ from .serializers import (
     TagSerializer,
 )
 
-locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
+months = {
+    1: 'января', 2: 'февраля', 3: 'марта', 4: 'апреля',
+    5: 'мая', 6: 'июня', 7: 'июля', 8: 'августа',
+    9: 'сентября', 10: 'октября', 11: 'ноября', 12: 'декабря'
+}
+
 
 BaseUser = get_user_model()
 
@@ -118,11 +122,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             .order_by('ingredient__name')
         )
         recipes = Recipe.objects.filter(carts__user=request.user).distinct()
+        today = date.today()
         return FileResponse(
             render_to_string(
                 'shopping_list.txt',
                 {
-                    'date': date.today().strftime('%d %B %Y'),
+                    'date': f"{today.day} {months[today.month]} {today.year}",
                     'shop_list': shop_list,
                     'recipes': recipes,
                 },
