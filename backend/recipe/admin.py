@@ -98,7 +98,7 @@ class IngredientAmountInline(admin.TabularInline):
     extra = 1
     autocomplete_fields = ['ingredient']
     readonly_fields = ('measurement_unit',)
-    fields = ('ingredient', 'amount', 'measurement_unit')
+    fields = ('ingredient', 'amount',)
 
     @admin.display(description='Единицы измерения')
     def measurement_unit(self, ingredient_amount):
