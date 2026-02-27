@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-if os.getenv('DATABASE_BACKEND', 'sqlite') == 'postgres':
+if os.getenv('DATABASE_BACKEND', 'postgres') == 'postgres':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
