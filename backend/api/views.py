@@ -1,5 +1,5 @@
-from datetime import date
 import locale
+from datetime import date
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
