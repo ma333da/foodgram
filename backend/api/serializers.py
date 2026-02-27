@@ -30,9 +30,7 @@ class FoodgramUserSerializer(UserSerializer):
         request = self.context.get('request')
         if request is None or not request.user.is_authenticated:
             return False
-        return Follow.objects.filter(
-            user=request.user, author=author
-        ).exists()
+        return Follow.objects.filter(user=request.user, author=author).exists()
 
 
 class CropRecipeSerializer(serializers.ModelSerializer):

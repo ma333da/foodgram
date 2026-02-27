@@ -96,7 +96,16 @@ class IngredientAdmin(Mixin, admin.ModelAdmin):
 class IngredientAmountInline(admin.TabularInline):
     model = IngredientAmount
     extra = 1
-    autocomplete_fields = ['ingredient']
+    autocomplete_fields = [
+        'ingredient',
+    ]
+    readonly_fields = ('measurement_unit',)
+    fields = ('ingredient', 'amount', 'measurement_unit')
+
+    def measurement_unit(self, obj):
+        if obj.ingredient and obj.ingredient.measurement_unit:
+            return obj.ingredient.measurement_unit
+        return '—'
 
 
 @admin.register(IngredientAmount)
@@ -133,17 +142,11 @@ class RecipeAdmin(admin.ModelAdmin):
         ),
         (
             'Изображение',
-            {
-                'fields': (
-                    'image',
-                    'image_preview'
-                    
-                )
-            },
+            {'fields': ('image', 'image_preview')},
         ),
         ('Теги и ингредиенты', {'fields': ('tags',)}),
     )
-    readonly_fields=('image_preview',)
+    readonly_fields = ('image_preview',)
 
     @admin.display(description='В избранном')
     def count_favorites(self, recipe):
