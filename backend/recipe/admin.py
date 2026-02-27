@@ -73,7 +73,7 @@ class BaseUserAdmin(UserAdmin, BaseAdminWithRecipeMixin):
     @admin.display(description='Подписчики')
     def follower_count(self, user):
         return user.authors.count()
-    
+
 
 @admin.register(Favorite, Cart)
 class FavoriteAndCartAdmin(admin.ModelAdmin):
@@ -113,7 +113,7 @@ class IngredientAmountAdmin(admin.ModelAdmin):
     @admin.display(description='Единицы измерения')
     def measurement_unit(self, ingredient_amount):
         return ingredient_amount.ingredient.measurement_unit
-    
+
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
