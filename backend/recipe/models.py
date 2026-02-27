@@ -168,12 +168,18 @@ class Recipe(models.Model):
         validators=(validators.MinValueValidator(MIN_COOKING_TIME),),
         verbose_name='Время (мин)',
     )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата публикации', auto_now_add=True
+    )
 
     def __str__(self):
         return self.name
 
     class Meta:
-        ordering = ('-id',)
+        ordering = (
+            '-pub_date',
+            '-id',
+        )
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         default_related_name = '%(class)ss'
